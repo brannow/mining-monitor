@@ -466,12 +466,83 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
             return adapterIndex;
         }
 
+        public string GetReference()
+        {
+            if (NVAPI.NvAPI_GPU_GetPCIIdentifiers != null)
+            {
+                uint deviceId, subSystemId, revisionId, extDeviceId;
+
+                NvStatus status = NVAPI.NvAPI_GPU_GetPCIIdentifiers(handle,
+                  out deviceId, out subSystemId, out revisionId, out extDeviceId);
+
+                if (status == NvStatus.OK)
+                {
+                    return string.Concat(deviceId.ToString(), "//", subSystemId.ToString(), "//", revisionId.ToString(), "//", extDeviceId.ToString());
+                }
+            }
+
+            return "";
+        }
+
         public string GetName()
         {
             return name;
         }
 
-    public override void Close() {
+        public float GetMemUsed()
+        {
+            if (memoryLoad.Value != null)
+                return (float)memoryLoad.Value;
+
+            return 0;
+        }
+
+        public float GetMemTotal()
+        {
+            if (memoryAvail.Value != null)
+                return (float)memoryAvail.Value;
+
+            return 0;
+        }
+
+        public float GetCoreUsed()
+        {
+            float usage = 0;
+            foreach (Sensor s in loads)
+            {
+                if (s.Name.Equals("GPU Core"))
+                {
+                    usage = (float)s.Value;
+                }
+            }
+
+            return usage;
+        }
+
+        public float GetCoreTemp()
+        {
+            float temp = 0;
+            foreach (Sensor s in temperatures)
+            {
+                if (s.Name.Equals("GPU Core"))
+                {
+                    temp = (float)s.Value;
+                }
+            }
+
+            return temp;
+        }
+
+        public float GetFanSpeed()
+        {
+            float fanSpeed = 0;
+            if (fan != null && fan.Value != null)
+                fanSpeed = (float)fan.Value;
+
+            return fanSpeed;
+        }
+
+        public override void Close() {
       if (this.fanControl != null) {
         this.fanControl.ControlModeChanged -= ControlModeChanged;
         this.fanControl.SoftwareControlValueChanged -=

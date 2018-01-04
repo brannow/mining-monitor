@@ -23,11 +23,68 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             Console.WriteLine("GPU: {0}", GetBusIndex());
             Console.WriteLine("GPU Name: {0}", GetName());
             Console.WriteLine("GPU REF: {0}", GetReference());
+            Console.WriteLine("GPU Temp: {0}", GetTemp());
+            Console.WriteLine("GPU memUsed: {0}", GetMemUsed());
+            Console.WriteLine("GPU memTotal: {0}", GetMemTotal());
+            Console.WriteLine("GPU Core used: {0}", GetCoreUsed());
+            Console.WriteLine("GPU Fan Speed: {0}", GetFanSpeed());
         }
 
         private string GetReference()
         {
-            return MD5Hash.Create(string.Concat(GetName(), GetBusIndex().ToString()));
+
+            if (gpu is FuyukaiHWMonitor.Hardware.Nvidia.NvidiaGPU gn)
+            {
+                return gn.GetReference();
+            }
+            else if (gpu is FuyukaiHWMonitor.Hardware.ATI.ATIGPU ga)
+            {
+                return ga.GetReference();
+            }
+
+            return "";
+        }
+
+        private float GetTemp()
+        {
+            if (gpu is FuyukaiHWMonitor.Hardware.Nvidia.NvidiaGPU gn)
+            {
+                return gn.GetCoreTemp();
+            }
+            else if (gpu is FuyukaiHWMonitor.Hardware.ATI.ATIGPU ga)
+            {
+                return ga.GetCoreTemp();
+            }
+
+            return 0;
+        }
+
+        private float GetMemUsed()
+        {
+            if (gpu is FuyukaiHWMonitor.Hardware.Nvidia.NvidiaGPU gn)
+            {
+                return gn.GetMemUsed();
+            }
+            else if (gpu is FuyukaiHWMonitor.Hardware.ATI.ATIGPU ga)
+            {
+                return ga.GetMemUsed();
+            }
+
+            return 0;
+        }
+
+        private float GetMemTotal()
+        {
+            if (gpu is FuyukaiHWMonitor.Hardware.Nvidia.NvidiaGPU gn)
+            {
+                return gn.GetMemTotal();
+            }
+            else if (gpu is FuyukaiHWMonitor.Hardware.ATI.ATIGPU ga)
+            {
+                return ga.GetMemTotal();
+            }
+
+            return 0;
         }
 
         private int GetBusIndex()
@@ -42,6 +99,33 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             return 0;
         }
 
+        private float GetCoreUsed()
+        {
+            if (gpu is FuyukaiHWMonitor.Hardware.Nvidia.NvidiaGPU gn)
+            {
+                return gn.GetCoreUsed();
+            }
+            else if (gpu is FuyukaiHWMonitor.Hardware.ATI.ATIGPU ga)
+            {
+                return ga.GetCoreUsed();
+            }
+
+            return 0;
+        }
+
+        private float GetFanSpeed()
+        {
+            if (gpu is FuyukaiHWMonitor.Hardware.Nvidia.NvidiaGPU gn)
+            {
+                return gn.GetFanSpeed();
+            }
+            else if (gpu is FuyukaiHWMonitor.Hardware.ATI.ATIGPU ga)
+            {
+                return ga.GetFanSpeed();
+            }
+
+            return 0;
+        }
 
         private string GetName()
         {

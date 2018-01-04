@@ -1,6 +1,7 @@
 
 using System;
 using System.Globalization;
+using System.Text;
 
 namespace FuyukaiHWMonitor.Hardware.ATI {
   public class ATIGPU : Hardware {
@@ -165,6 +166,48 @@ namespace FuyukaiHWMonitor.Hardware.ATI {
         public string GetName()
         {
             return name;
+        }
+
+        public float GetMemUsed()
+        {
+            return 0;
+        }
+
+        public float GetMemTotal()
+        {
+            return 0;
+        }
+
+        public string GetReference()
+        {
+            return string.Concat(deviceNumber.ToString(),"//", busNumber.ToString());
+        }
+
+        public float GetCoreUsed()
+        {
+            float coreClockLoad = 0;
+            if (coreLoad != null && coreLoad.Value != null)
+                coreClockLoad = (float)coreLoad.Value;
+
+            return coreClockLoad;
+        }
+
+        public float GetCoreTemp()
+        {
+            float temp = 0;
+            if (temperature != null && temperature.Value != null)
+                temp = (float)temperature.Value;
+
+            return temp;
+        }
+
+        public float GetFanSpeed()
+        {
+            float fanSpeed = 0;
+            if (fan != null && fan.Value != null)
+                fanSpeed = (float)fan.Value;
+
+            return fanSpeed;
         }
 
         public override void Close() {

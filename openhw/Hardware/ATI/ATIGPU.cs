@@ -178,10 +178,17 @@ namespace FuyukaiHWMonitor.Hardware.ATI {
             return 0;
         }
 
+        public string GetSerial()
+        {
+            return "";
+        }
+
         public string GetReference()
         {
             return string.Concat(deviceNumber.ToString(),"//", busNumber.ToString());
         }
+
+
 
         public float GetCoreUsed()
         {

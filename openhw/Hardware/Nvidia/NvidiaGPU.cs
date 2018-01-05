@@ -10,6 +10,7 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
     private readonly NvPhysicalGpuHandle handle;
     private readonly NvDisplayHandle? displayHandle;
 
+    private readonly string serial = "";
     private readonly Sensor[] temperatures;
     private readonly Sensor fan;
     private readonly Sensor[] clocks;
@@ -46,8 +47,20 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
           new ParameterDescription[0], settings);
         ActivateSensor(temperatures[i]);
       }
+            StringBuilder sn = new StringBuilder(64);
+            if (NVAPI.NvAPI_GPU_GetSerialNumber != null &&
+              NVAPI.NvAPI_GPU_GetSerialNumber(handle, sn) == NvStatus.OK)
+            {
+                StringBuilder snb = new StringBuilder((sn.Length - 1) * 2);
+                foreach (byte b in sn.ToString().ToCharArray(1, sn.Length - 1))
+                {
+                    snb.AppendFormat("{0:X2}", b);
+                }
 
-      int value;
+                this.serial = snb.ToString();
+            }
+
+            int value;
       if (NVAPI.NvAPI_GPU_GetTachReading != null &&
         NVAPI.NvAPI_GPU_GetTachReading(handle, out value) == NvStatus.OK) {
         if (value >= 0) {
@@ -540,6 +553,11 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
                 fanSpeed = (float)fan.Value;
 
             return fanSpeed;
+        }
+
+        public string GetSerial()
+        {
+            return this.serial;
         }
 
         public override void Close() {

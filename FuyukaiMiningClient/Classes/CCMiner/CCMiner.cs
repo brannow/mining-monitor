@@ -20,6 +20,30 @@ namespace FuyukaiMiningClient.Classes.CCMiner
 
         private Dictionary<string, string> data = new Dictionary<string, string>();
 
+        public static IList<IList<KeyValuePair<string, string>>> ResultParser(string data)
+        {
+            List<IList<KeyValuePair<string, string>>> list = new List<IList<KeyValuePair<string, string>>>();
+            Dictionary<string, string> resultSegment = new Dictionary<string, string>();
+            String[] segments = data.Split('|');
+
+            foreach (String segment in segments) {
+                String[] items = segment.Split(';');
+                foreach (String item in items) {
+                    String[] keyValue = item.Split('=');
+                    if (keyValue.Length == 2) {
+                        resultSegment.Add(keyValue[0], keyValue[1]);
+                    }
+                }
+
+                if (resultSegment.Count > 0) {
+                    list.Add(resultSegment.ToList());
+                    resultSegment.Clear();
+                }
+            }
+
+            return list.ToArray();
+        }
+
         public CCMiner(Config cfg, TelemetryData.Rig r)
         {
             this.rig = r;
@@ -100,7 +124,14 @@ namespace FuyukaiMiningClient.Classes.CCMiner
 
         public void Collect()
         {
-            this.CollectStart();
+            Process[] ccminers = Process.GetProcessesByName("ccminer-x64");
+            if (ccminers.Length > 0)
+            {
+                this.CollectStart();
+            } else
+            {
+                this.OnError();
+            }
         }
 
         public void CollectStart()

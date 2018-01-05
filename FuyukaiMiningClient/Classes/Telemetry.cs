@@ -17,6 +17,10 @@ namespace FuyukaiMiningClient.Classes
 
         public Telemetry(Config cfg)
         {
+            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            customCulture.NumberFormat.NumberDecimalSeparator = ".";
+            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
+
             this.config = cfg;
             Telemetry.request = new Request(cfg.ServerAddress(), this);
             Telemetry.rig = new Rig(cfg, this);
@@ -31,9 +35,9 @@ namespace FuyukaiMiningClient.Classes
             }
         }
 
-        public void CollectingDone(Rig r)
+        public void CollectingDone(Rig r, string jsonData)
         {
-            Console.WriteLine("CollectingDone");
+            Console.WriteLine(jsonData);
             Telemetry.request.SendData("{}");
         }
 

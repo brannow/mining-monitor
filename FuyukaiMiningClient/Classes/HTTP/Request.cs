@@ -15,12 +15,14 @@ namespace FuyukaiMiningClient.Classes.HTTP
     {
         private string serverAddress;
         private static readonly HttpClient client = new HttpClient();
+        private Telemetry del;
 
         private const string FUYUKAI_REQUEST = "763b8d6505789c7a9f3c9d0dec047ba8";
         private const string SERVER_PRIVATE_KEY = "8hCBriYA29v6ha67XRqM63rAn2kGahJK4";
 
-        public Request(string serverAddress)
+        public Request(string serverAddress, Telemetry del)
         {
+            this.del = del;
             this.serverAddress = serverAddress;
 
             client.DefaultRequestHeaders
@@ -31,6 +33,7 @@ namespace FuyukaiMiningClient.Classes.HTTP
 
         public async void SendData(string jsonData)
         {
+            Console.WriteLine(">>> SEND REQUEST");
             if (this.serverAddress != null && this.serverAddress.Length > 0)
             {
                 string dateTimeString = DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss");
@@ -43,9 +46,19 @@ namespace FuyukaiMiningClient.Classes.HTTP
                 { "signature", this.GenerateSignature(jsonData, dateTimeString) }
             };
 
+                string responseString = "";
                 HttpContent content = new FormUrlEncodedContent(data);
-                HttpResponseMessage response = await client.PostAsync(this.serverAddress, content);
-                string responseString = await response.Content.ReadAsStringAsync();
+                try
+                {
+                    HttpResponseMessage response = await client.PostAsync(this.serverAddress, content);
+                    responseString = await response.Content.ReadAsStringAsync();
+                }
+                catch (Exception e) {
+                    del.SendingError(this, e);
+                    return;
+                }
+
+                del.SendingDone(this, responseString);
             }
             else {
                 Console.WriteLine(">>> WARNING: INVLAID SERVER URL, NO DATA SEND");

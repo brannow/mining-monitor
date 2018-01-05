@@ -31,6 +31,21 @@ namespace FuyukaiMiningClient.Classes
                 rigName = "Rig#01";
             } 
             this.configData.Add("rig.name", rigName);
+
+            // ccminer config
+            string ccminerHost = file.Read("host", "ccminer");
+            if (ccminerHost.Equals(""))
+            {
+                ccminerHost = "127.0.0.1";
+            }
+            this.configData.Add("ccminer.host", ccminerHost);
+            string ccminerPort = file.Read("port", "ccminer");
+            if (ccminerPort.Equals(""))
+            {
+                ccminerPort = "4068";
+            }
+            this.configData.Add("ccminer.port", ccminerPort);
+
         }
 
         private string GetConfigValue(string key)
@@ -52,5 +67,19 @@ namespace FuyukaiMiningClient.Classes
         {
             return this.GetConfigValue("rig.name");
         }
+
+        public string CCMinerPort()
+        {
+            return this.GetConfigValue("ccminer.port");
+        }
+
+        public string CCMinerHost()
+        {
+            return this.GetConfigValue("ccminer.host");
+        }
+
+        
+
+            
     }
 }

@@ -5,29 +5,24 @@ using System.Threading;
 // Fuyukai
 using FuyukaiMiningClient.Classes;
 
-
 namespace FuyukaiMiningClient
 {
     class Program
     {
         private static Config config = new Config();
-        private const int INTERVAL = 300000; // 300sec = 5min 
+        private const int INTERVAL = 20000; // 300sec = 5min 
 
         static void Main(string[] args)
         {
             Program.PrintBootHeader();
             Telemetry telemetry = new Telemetry(Program.config);
-            
-            telemetry.Collect();
             telemetry.Send();
-            telemetry.Clear();
 
             while (true) {
                 Thread.Sleep(Program.INTERVAL);
-                telemetry.Collect();
                 telemetry.Send();
-                telemetry.Clear();
             }
+            
         }
 
         private static void PrintBootHeader()

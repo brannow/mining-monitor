@@ -18,18 +18,43 @@ namespace FuyukaiMiningClient.Classes
         public Telemetry(Config cfg)
         {
             this.config = cfg;
-            Telemetry.request = new Request(cfg.ServerAddress());
-            Telemetry.rig = new Rig(cfg);
-        }
-
-        public void Collect()
-        {
-            Telemetry.rig.Collect();
+            Telemetry.request = new Request(cfg.ServerAddress(), this);
+            Telemetry.rig = new Rig(cfg, this);
         }
 
         public void Send()
         {
+            Console.WriteLine("TRY Send -> Collect");
+            if (Telemetry.rig.IsCollectorIdle()) {
+                Console.WriteLine("Send -> Collect");
+                Telemetry.rig.Collect();
+            }
+        }
+
+        public void CollectingDone(Rig r)
+        {
+            Console.WriteLine("CollectingDone");
             Telemetry.request.SendData("{}");
+        }
+
+        public void CollectingError(Rig r)
+        {
+            Console.WriteLine("CollectingError");
+            this.Clear();
+        }
+
+        public void SendingDone(Request r, string response)
+        {
+            Console.WriteLine("SEND DONE:");
+            Console.WriteLine(response);
+            this.Clear();
+        }
+
+        public void SendingError(Request r, Exception e)
+        {
+            Console.WriteLine("SEND ERROR:");
+            Console.WriteLine(e.Message);
+            this.Clear();
         }
 
         public void Clear()

@@ -90,10 +90,88 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\CCMiner\CCMiner.cs" />
     <Compile Include="Classes\Config.cs" />
     <Compile Include="Classes\Crypto\MD5Hash.cs" />
     <Compile Include="Classes\Hardware.cs" />
     <Compile Include="Classes\HTTP\Request.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\ByteOrder.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\CloseEventArgs.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\CloseStatusCode.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\CompressionMethod.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\ErrorEventArgs.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Ext.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Fin.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\HttpBase.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\HttpRequest.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\HttpResponse.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\LogData.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Logger.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\LogLevel.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Mask.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\MessageEventArgs.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\AuthenticationBase.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\AuthenticationChallenge.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\AuthenticationResponse.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\AuthenticationSchemes.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\Chunk.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\ChunkedRequestStream.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\ChunkStream.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\ClientSslConfiguration.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\Cookie.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\CookieCollection.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\CookieException.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\EndPointListener.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\EndPointManager.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpBasicIdentity.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpConnection.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpDigestIdentity.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpHeaderInfo.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpHeaderType.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpListener.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpListenerAsyncResult.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpListenerContext.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpListenerException.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpListenerPrefix.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpListenerPrefixCollection.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpListenerRequest.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpListenerResponse.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpRequestHeader.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpResponseHeader.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpStatusCode.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpStreamAsyncResult.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpUtility.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\HttpVersion.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\InputChunkState.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\InputState.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\LineState.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\NetworkCredential.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\QueryStringCollection.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\ReadBufferState.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\RequestStream.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\ResponseStream.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\ServerSslConfiguration.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\WebHeaderCollection.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\WebSockets\HttpListenerWebSocketContext.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\WebSockets\TcpListenerWebSocketContext.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Net\WebSockets\WebSocketContext.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Opcode.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\PayloadData.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Rsv.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Server\HttpRequestEventArgs.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Server\HttpServer.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Server\IWebSocketSession.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Server\ServerState.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Server\WebSocketBehavior.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Server\WebSocketServer.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Server\WebSocketServiceHost.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Server\WebSocketServiceHost`1.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Server\WebSocketServiceManager.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\Server\WebSocketSessionManager.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\WebSocket.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\WebSocketException.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\WebSocketFrame.cs" />
+    <Compile Include="Classes\HTTP\WebSocket\WebSocketState.cs" />
     <Compile Include="Classes\IniFile.cs" />
     <Compile Include="Classes\Telemetry.cs" />
     <Compile Include="Classes\TelemetryData\Gpu.cs" />
@@ -124,5 +202,6 @@
       <Name>FuyukaiLib</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

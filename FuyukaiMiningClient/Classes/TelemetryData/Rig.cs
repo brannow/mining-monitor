@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 
 using FuyukaiHWMonitor.Hardware;
+using FuyukaiMiningClient.Classes;
 
 namespace FuyukaiMiningClient.Classes.TelemetryData
 {
@@ -15,11 +16,19 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
         private static Gpu[] gpus;
         private static Config config;
 
+        private bool collectorStatus = true;
+
+        private static CCMiner.CCMiner ccminer;
+
+        private Telemetry del;
+
         // rig Data
         private string name = "";
 
-        public Rig(Config cfg)
+        public Rig(Config cfg, Telemetry del)
         {
+            this.del = del;
+            Rig.config = cfg;
             Rig.computer.CPUEnabled = true;
             Rig.computer.GPUEnabled = true;
             Rig.computer.RAMEnabled = true;
@@ -32,9 +41,9 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
                 list.Add(g);
             }
             Rig.gpus = list.ToArray();
-
-            Rig.config = cfg;
             this.name = cfg.RigName();
+
+            ccminer = new CCMiner.CCMiner(cfg, this);
         }
 
         private float CpuUsage()
@@ -67,9 +76,9 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             return this.name;
         }
 
-
         public void Collect()
         {
+            collectorStatus = false;
             Rig.computer.UpdateHardware();
             Console.WriteLine("CPU USAGE: {0}", this.CpuUsage());
             Console.WriteLine("CPU Temp: {0}", this.CpuTemp());
@@ -82,11 +91,47 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             foreach (Gpu g in Rig.gpus) {
                 g.Collect();
             }
+
+            // add external TEMP HDI SENSOR HERE
+
+            ccminer.Collect();
+        }
+
+        public void CCMinerDone(CCMiner.CCMiner c, string summary, string hwInfo, string threads)
+        {
+            Console.WriteLine(summary);
+            Console.WriteLine(hwInfo);
+            Console.WriteLine(threads);
+            this.RigPowerUsageCollect();
+        }
+
+        public void CCMinerError(CCMiner.CCMiner c)
+        {
+            del.CollectingError(this);
+        }
+
+        public void RigPowerUsageCollect()
+        {
+            // ADD SMART WATT USAGE DETECTION HEHE
+            Console.WriteLine("Collect RIG WATT CONSUME");
+            this.RigPowerUsageDone();
+        }
+
+        public void RigPowerUsageDone()
+        {
+            Console.WriteLine("DONE RIG WATT");
+            del.CollectingDone(this);
+        }
+
+        public bool IsCollectorIdle()
+        {
+            return collectorStatus;
         }
 
         public void Clear()
         {
-
+            collectorStatus = true;
+            ccminer.Clear();
         }
     }
 }

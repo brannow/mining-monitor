@@ -54,12 +54,14 @@ namespace FuyukaiHWMonitor.Hardware.ATI {
     }
 
     private void SoftwareControlValueChanged(IControl control) {
-      if (control.ControlMode == ControlMode.Software) {        
-        ADLFanSpeedValue adlf = new ADLFanSpeedValue();
-        adlf.SpeedType = ADL.ADL_DL_FANCTRL_SPEED_TYPE_PERCENT;
-        adlf.Flags = ADL.ADL_DL_FANCTRL_FLAG_USER_DEFINED_SPEED;
-        adlf.FanSpeed = (int)control.SoftwareValue;
-        ADL.ADL_Overdrive5_FanSpeed_Set(adapterIndex, 0, ref adlf);
+      if (control.ControlMode == ControlMode.Software) {
+                ADLFanSpeedValue adlf = new ADLFanSpeedValue
+                {
+                    SpeedType = ADL.ADL_DL_FANCTRL_SPEED_TYPE_PERCENT,
+                    Flags = ADL.ADL_DL_FANCTRL_FLAG_USER_DEFINED_SPEED,
+                    FanSpeed = (int)control.SoftwareValue
+                };
+                ADL.ADL_Overdrive5_FanSpeed_Set(adapterIndex, 0, ref adlf);
       }
     }
 
@@ -102,9 +104,11 @@ namespace FuyukaiHWMonitor.Hardware.ATI {
         temperature.Value = null;
       }
 
-      ADLFanSpeedValue adlf = new ADLFanSpeedValue();
-      adlf.SpeedType = ADL.ADL_DL_FANCTRL_SPEED_TYPE_RPM;
-      if (ADL.ADL_Overdrive5_FanSpeed_Get(adapterIndex, 0, ref adlf)
+            ADLFanSpeedValue adlf = new ADLFanSpeedValue
+            {
+                SpeedType = ADL.ADL_DL_FANCTRL_SPEED_TYPE_RPM
+            };
+            if (ADL.ADL_Overdrive5_FanSpeed_Get(adapterIndex, 0, ref adlf)
         == ADL.ADL_OK) 
       {
         fan.Value = adlf.FanSpeed;
@@ -113,9 +117,11 @@ namespace FuyukaiHWMonitor.Hardware.ATI {
         fan.Value = null;
       }
 
-      adlf = new ADLFanSpeedValue();
-      adlf.SpeedType = ADL.ADL_DL_FANCTRL_SPEED_TYPE_PERCENT;
-      if (ADL.ADL_Overdrive5_FanSpeed_Get(adapterIndex, 0, ref adlf)
+            adlf = new ADLFanSpeedValue
+            {
+                SpeedType = ADL.ADL_DL_FANCTRL_SPEED_TYPE_PERCENT
+            };
+            if (ADL.ADL_Overdrive5_FanSpeed_Get(adapterIndex, 0, ref adlf)
         == ADL.ADL_OK) {
         controlSensor.Value = adlf.FanSpeed;
         ActivateSensor(controlSensor);

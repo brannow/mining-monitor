@@ -462,16 +462,18 @@ Extended Payload Length: {7}
       if (err != null)
         throw new WebSocketException (CloseStatusCode.ProtocolError, err);
 
-      var frame = new WebSocketFrame ();
-      frame._fin = fin;
-      frame._rsv1 = rsv1;
-      frame._rsv2 = rsv2;
-      frame._rsv3 = rsv3;
-      frame._opcode = (Opcode) opcode;
-      frame._mask = mask;
-      frame._payloadLength = payloadLen;
+            var frame = new WebSocketFrame
+            {
+                _fin = fin,
+                _rsv1 = rsv1,
+                _rsv2 = rsv2,
+                _rsv3 = rsv3,
+                _opcode = (Opcode)opcode,
+                _mask = mask,
+                _payloadLength = payloadLen
+            };
 
-      return frame;
+            return frame;
     }
 
     private static WebSocketFrame readExtendedPayloadLength (Stream stream, WebSocketFrame frame)

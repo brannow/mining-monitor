@@ -113,11 +113,13 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
     }
 
     private NvGPUThermalSettings GetThermalSettings() {
-      NvGPUThermalSettings settings = new NvGPUThermalSettings();
-      settings.Version = NVAPI.GPU_THERMAL_SETTINGS_VER;
-      settings.Count = NVAPI.MAX_THERMAL_SENSORS_PER_GPU;
-      settings.Sensor = new NvSensor[NVAPI.MAX_THERMAL_SENSORS_PER_GPU];
-      if (!(NVAPI.NvAPI_GPU_GetThermalSettings != null &&
+            NvGPUThermalSettings settings = new NvGPUThermalSettings
+            {
+                Version = NVAPI.GPU_THERMAL_SETTINGS_VER,
+                Count = NVAPI.MAX_THERMAL_SENSORS_PER_GPU,
+                Sensor = new NvSensor[NVAPI.MAX_THERMAL_SENSORS_PER_GPU]
+            };
+            if (!(NVAPI.NvAPI_GPU_GetThermalSettings != null &&
         NVAPI.NvAPI_GPU_GetThermalSettings(handle, (int)NvThermalTarget.ALL,
           ref settings) == NvStatus.OK)) 
       {
@@ -127,10 +129,12 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
     }
 
     private NvGPUCoolerSettings GetCoolerSettings() {
-      NvGPUCoolerSettings settings = new NvGPUCoolerSettings();
-      settings.Version = NVAPI.GPU_COOLER_SETTINGS_VER;
-      settings.Cooler = new NvCooler[NVAPI.MAX_COOLER_PER_GPU];
-      if (!(NVAPI.NvAPI_GPU_GetCoolerSettings != null &&
+            NvGPUCoolerSettings settings = new NvGPUCoolerSettings
+            {
+                Version = NVAPI.GPU_COOLER_SETTINGS_VER,
+                Cooler = new NvCooler[NVAPI.MAX_COOLER_PER_GPU]
+            };
+            if (!(NVAPI.NvAPI_GPU_GetCoolerSettings != null &&
         NVAPI.NvAPI_GPU_GetCoolerSettings(handle, 0, 
           ref settings) == NvStatus.OK)) 
       {
@@ -140,10 +144,12 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
     }
 
     private uint[] GetClocks() {
-      NvClocks allClocks = new NvClocks();
-      allClocks.Version = NVAPI.GPU_CLOCKS_VER;
-      allClocks.Clock = new uint[NVAPI.MAX_CLOCKS_PER_GPU];
-      if (NVAPI.NvAPI_GPU_GetAllClocks != null &&
+            NvClocks allClocks = new NvClocks
+            {
+                Version = NVAPI.GPU_CLOCKS_VER,
+                Clock = new uint[NVAPI.MAX_CLOCKS_PER_GPU]
+            };
+            if (NVAPI.NvAPI_GPU_GetAllClocks != null &&
         NVAPI.NvAPI_GPU_GetAllClocks(handle, ref allClocks) == NvStatus.OK) {
         return allClocks.Clock;
       }
@@ -173,10 +179,12 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
         }
       }
 
-      NvPStates states = new NvPStates();
-      states.Version = NVAPI.GPU_PSTATES_VER;
-      states.PStates = new NvPState[NVAPI.MAX_PSTATES_PER_GPU];
-      if (NVAPI.NvAPI_GPU_GetPStates != null &&
+            NvPStates states = new NvPStates
+            {
+                Version = NVAPI.GPU_PSTATES_VER,
+                PStates = new NvPState[NVAPI.MAX_PSTATES_PER_GPU]
+            };
+            if (NVAPI.NvAPI_GPU_GetPStates != null &&
         NVAPI.NvAPI_GPU_GetPStates(handle, ref states) == NvStatus.OK) {
         for (int i = 0; i < 3; i++)
           if (states.PStates[i].Present) {
@@ -184,10 +192,12 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
             ActivateSensor(loads[i]);
           }
       } else {
-        NvUsages usages = new NvUsages();
-        usages.Version = NVAPI.GPU_USAGES_VER;
-        usages.Usage = new uint[NVAPI.MAX_USAGES_PER_GPU];
-        if (NVAPI.NvAPI_GPU_GetUsages != null &&
+                NvUsages usages = new NvUsages
+                {
+                    Version = NVAPI.GPU_USAGES_VER,
+                    Usage = new uint[NVAPI.MAX_USAGES_PER_GPU]
+                };
+                if (NVAPI.NvAPI_GPU_GetUsages != null &&
           NVAPI.NvAPI_GPU_GetUsages(handle, ref usages) == NvStatus.OK) {
           loads[0].Value = usages.Usage[2];
           loads[1].Value = usages.Usage[6];
@@ -204,10 +214,12 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
         ActivateSensor(control);
       }
 
-      NvMemoryInfo memoryInfo = new NvMemoryInfo();
-      memoryInfo.Version = NVAPI.GPU_MEMORY_INFO_VER;
-      memoryInfo.Values = new uint[NVAPI.MAX_MEMORY_VALUES_PER_GPU];
-      if (NVAPI.NvAPI_GPU_GetMemoryInfo != null && displayHandle.HasValue &&
+            NvMemoryInfo memoryInfo = new NvMemoryInfo
+            {
+                Version = NVAPI.GPU_MEMORY_INFO_VER,
+                Values = new uint[NVAPI.MAX_MEMORY_VALUES_PER_GPU]
+            };
+            if (NVAPI.NvAPI_GPU_GetMemoryInfo != null && displayHandle.HasValue &&
         NVAPI.NvAPI_GPU_GetMemoryInfo(displayHandle.Value, ref memoryInfo) ==
         NvStatus.OK) {
         uint totalMemory = memoryInfo.Values[0];
@@ -234,9 +246,11 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
       r.AppendFormat("Index: {0}{1}", adapterIndex, Environment.NewLine);
 
       if (displayHandle.HasValue && NVAPI.NvAPI_GetDisplayDriverVersion != null) {
-        NvDisplayDriverVersion driverVersion = new NvDisplayDriverVersion();
-        driverVersion.Version = NVAPI.DISPLAY_DRIVER_VERSION_VER;
-        if (NVAPI.NvAPI_GetDisplayDriverVersion(displayHandle.Value,
+                NvDisplayDriverVersion driverVersion = new NvDisplayDriverVersion
+                {
+                    Version = NVAPI.DISPLAY_DRIVER_VERSION_VER
+                };
+                if (NVAPI.NvAPI_GetDisplayDriverVersion(displayHandle.Value,
           ref driverVersion) == NvStatus.OK) {
           r.Append("Driver Version: ");
           r.Append(driverVersion.DriverVersion / 100);
@@ -270,12 +284,14 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
       }
 
       if (NVAPI.NvAPI_GPU_GetThermalSettings != null) {
-        NvGPUThermalSettings settings = new NvGPUThermalSettings();
-        settings.Version = NVAPI.GPU_THERMAL_SETTINGS_VER;
-        settings.Count = NVAPI.MAX_THERMAL_SENSORS_PER_GPU;
-        settings.Sensor = new NvSensor[NVAPI.MAX_THERMAL_SENSORS_PER_GPU];
+                NvGPUThermalSettings settings = new NvGPUThermalSettings
+                {
+                    Version = NVAPI.GPU_THERMAL_SETTINGS_VER,
+                    Count = NVAPI.MAX_THERMAL_SENSORS_PER_GPU,
+                    Sensor = new NvSensor[NVAPI.MAX_THERMAL_SENSORS_PER_GPU]
+                };
 
-        NvStatus status = NVAPI.NvAPI_GPU_GetThermalSettings(handle,
+                NvStatus status = NVAPI.NvAPI_GPU_GetThermalSettings(handle,
           (int)NvThermalTarget.ALL, ref settings);
 
         r.AppendLine("Thermal Settings");
@@ -301,10 +317,12 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
       }
 
       if (NVAPI.NvAPI_GPU_GetAllClocks != null) {
-        NvClocks allClocks = new NvClocks();
-        allClocks.Version = NVAPI.GPU_CLOCKS_VER;
-        allClocks.Clock = new uint[NVAPI.MAX_CLOCKS_PER_GPU];
-        NvStatus status = NVAPI.NvAPI_GPU_GetAllClocks(handle, ref allClocks);
+                NvClocks allClocks = new NvClocks
+                {
+                    Version = NVAPI.GPU_CLOCKS_VER,
+                    Clock = new uint[NVAPI.MAX_CLOCKS_PER_GPU]
+                };
+                NvStatus status = NVAPI.NvAPI_GPU_GetAllClocks(handle, ref allClocks);
 
         r.AppendLine("Clocks");
         r.AppendLine();
@@ -337,10 +355,12 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
       }
 
       if (NVAPI.NvAPI_GPU_GetPStates != null) {
-        NvPStates states = new NvPStates();
-        states.Version = NVAPI.GPU_PSTATES_VER;
-        states.PStates = new NvPState[NVAPI.MAX_PSTATES_PER_GPU];
-        NvStatus status = NVAPI.NvAPI_GPU_GetPStates(handle, ref states);
+                NvPStates states = new NvPStates
+                {
+                    Version = NVAPI.GPU_PSTATES_VER,
+                    PStates = new NvPState[NVAPI.MAX_PSTATES_PER_GPU]
+                };
+                NvStatus status = NVAPI.NvAPI_GPU_GetPStates(handle, ref states);
 
         r.AppendLine("P-States");
         r.AppendLine();
@@ -357,10 +377,12 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
       }
 
       if (NVAPI.NvAPI_GPU_GetUsages != null) {
-        NvUsages usages = new NvUsages();
-        usages.Version = NVAPI.GPU_USAGES_VER;
-        usages.Usage = new uint[NVAPI.MAX_USAGES_PER_GPU];
-        NvStatus status = NVAPI.NvAPI_GPU_GetUsages(handle, ref usages);
+                NvUsages usages = new NvUsages
+                {
+                    Version = NVAPI.GPU_USAGES_VER,
+                    Usage = new uint[NVAPI.MAX_USAGES_PER_GPU]
+                };
+                NvStatus status = NVAPI.NvAPI_GPU_GetUsages(handle, ref usages);
 
         r.AppendLine("Usages");
         r.AppendLine();
@@ -377,10 +399,12 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
       }
 
       if (NVAPI.NvAPI_GPU_GetCoolerSettings != null) {
-        NvGPUCoolerSettings settings = new NvGPUCoolerSettings();
-        settings.Version = NVAPI.GPU_COOLER_SETTINGS_VER;
-        settings.Cooler = new NvCooler[NVAPI.MAX_COOLER_PER_GPU];
-        NvStatus status =
+                NvGPUCoolerSettings settings = new NvGPUCoolerSettings
+                {
+                    Version = NVAPI.GPU_COOLER_SETTINGS_VER,
+                    Cooler = new NvCooler[NVAPI.MAX_COOLER_PER_GPU]
+                };
+                NvStatus status =
           NVAPI.NvAPI_GPU_GetCoolerSettings(handle, 0, ref settings);
 
         r.AppendLine("Cooler Settings");
@@ -420,10 +444,12 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
       }
 
       if (NVAPI.NvAPI_GPU_GetMemoryInfo != null && displayHandle.HasValue) {
-        NvMemoryInfo memoryInfo = new NvMemoryInfo();
-        memoryInfo.Version = NVAPI.GPU_MEMORY_INFO_VER;
-        memoryInfo.Values = new uint[NVAPI.MAX_MEMORY_VALUES_PER_GPU];
-        NvStatus status = NVAPI.NvAPI_GPU_GetMemoryInfo(displayHandle.Value,
+                NvMemoryInfo memoryInfo = new NvMemoryInfo
+                {
+                    Version = NVAPI.GPU_MEMORY_INFO_VER,
+                    Values = new uint[NVAPI.MAX_MEMORY_VALUES_PER_GPU]
+                };
+                NvStatus status = NVAPI.NvAPI_GPU_GetMemoryInfo(displayHandle.Value,
           ref memoryInfo);
 
         r.AppendLine("Memory Info");
@@ -443,10 +469,12 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
     }
 
     private void SoftwareControlValueChanged(IControl control) {
-      NvGPUCoolerLevels coolerLevels = new NvGPUCoolerLevels();
-      coolerLevels.Version = NVAPI.GPU_COOLER_LEVELS_VER;
-      coolerLevels.Levels = new NvLevel[NVAPI.MAX_COOLER_PER_GPU];
-      coolerLevels.Levels[0].Level = (int)control.SoftwareValue;
+            NvGPUCoolerLevels coolerLevels = new NvGPUCoolerLevels
+            {
+                Version = NVAPI.GPU_COOLER_LEVELS_VER,
+                Levels = new NvLevel[NVAPI.MAX_COOLER_PER_GPU]
+            };
+            coolerLevels.Levels[0].Level = (int)control.SoftwareValue;
       coolerLevels.Levels[0].Policy = 1;
       NVAPI.NvAPI_GPU_SetCoolerLevels(handle, 0, ref coolerLevels);
     }
@@ -467,10 +495,12 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
     }
 
     private void SetDefaultFanSpeed() {
-      NvGPUCoolerLevels coolerLevels = new NvGPUCoolerLevels();
-      coolerLevels.Version = NVAPI.GPU_COOLER_LEVELS_VER;
-      coolerLevels.Levels = new NvLevel[NVAPI.MAX_COOLER_PER_GPU];
-      coolerLevels.Levels[0].Policy = 0x20;
+            NvGPUCoolerLevels coolerLevels = new NvGPUCoolerLevels
+            {
+                Version = NVAPI.GPU_COOLER_LEVELS_VER,
+                Levels = new NvLevel[NVAPI.MAX_COOLER_PER_GPU]
+            };
+            coolerLevels.Levels[0].Policy = 0x20;
       NVAPI.NvAPI_GPU_SetCoolerLevels(handle, 0, ref coolerLevels);
     }
 

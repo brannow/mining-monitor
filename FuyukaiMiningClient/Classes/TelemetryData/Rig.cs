@@ -22,6 +22,8 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
 
         private Telemetry del;
 
+        private static TPLink.SmartPowerSocket smartPlug;
+
         // rig Data
         private string name = "";
         // TEMP RIG DATA
@@ -32,6 +34,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
         {
             this.del = del;
             Rig.config = cfg;
+            Rig.smartPlug = new TPLink.SmartPowerSocket(cfg.SmartSocketHost());
             Rig.computer.CPUEnabled = true;
             Rig.computer.GPUEnabled = true;
             Rig.computer.RAMEnabled = true;
@@ -86,6 +89,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
 
         public void CCMinerDone(CCMiner.CCMiner c, string summary, string hwInfo, string threads)
         {
+            Program.WriteLine("CCMiner: Data Collected ... start parsing", false, true);
             IList <IList<KeyValuePair<string, string>>> summaryList = CCMiner.CCMiner.ResultParser(summary);
             if (summaryList.Count() > 0)
             {
@@ -203,25 +207,12 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
                 }
             }
 
-            this.RigPowerUsageCollect();
+            this.CollectingDone();
         }
 
         public void CCMinerError(CCMiner.CCMiner c)
         {
             del.CollectingError(this);
-        }
-
-        public void RigPowerUsageCollect()
-        {
-            // ADD SMART WATT USAGE DETECTION HEHE
-            Console.WriteLine("Collect RIG WATT CONSUME");
-            this.RigPowerUsageDone();
-        }
-
-        public void RigPowerUsageDone()
-        {
-            Console.WriteLine("DONE RIG WATT");
-            this.CollectingDone();
         }
 
         private string RigDataToJsonString()
@@ -231,7 +222,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
 
             StringBuilder r = new StringBuilder("{");
-
+            Program.WriteLine("Parse Collected Data to Json", false, true);
             r.AppendFormat("\"identifier\":\"{0}\",", this.Identifier());
             r.AppendFormat("\"name\":\"{0}\",", this.Name());
             r.AppendFormat("\"os-uptime\":{0},", this.Uptime());
@@ -241,6 +232,11 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             r.AppendFormat("\"ccminer-uptime\":{0},", this.minerUptime);
             r.AppendFormat("\"ccminer-khash-rate\":{0},", this.rigHashRate);
 
+            TPLink.Power p = Rig.smartPlug.GetPower();
+            r.AppendFormat("\"power\":{0},", p.watt);
+            r.AppendFormat("\"kwh\":{0},", p.kwh);
+
+            Program.WriteLine("Parse GPU DATA", false, true);
             List<string> gpujsonStrings = new List<string>();
             foreach (Gpu g in Rig.gpus)
             {
@@ -258,11 +254,13 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             Rig.computer.UpdateHardware();
             // add external TEMP HDI SENSOR HERE
 
+            Program.WriteLine("Hardware updated", false, true);
             ccminer.Collect();
         }
 
         private void CollectingDone()
         {
+            Program.WriteLine("All Data Collected", false, true);
             del.CollectingDone(this, this.RigDataToJsonString());
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading;
 
 using WebSocketSharp;
@@ -9,16 +10,13 @@ namespace FuyukaiMiningClient.Classes.CCMiner
 {
     class CCMiner
     {
-        private Process ccminer;
         private WebSocket summary;
         private WebSocket hwInfo;
         private WebSocket threads;
 
-        private bool ignoreChain = true;
-
         private TelemetryData.Rig rig;
 
-        private Dictionary<string, string> data = new Dictionary<string, string>();
+        public Dictionary<string, string> data = new Dictionary<string, string>();
 
         public static IList<IList<KeyValuePair<string, string>>> ResultParser(string data)
         {
@@ -26,16 +24,20 @@ namespace FuyukaiMiningClient.Classes.CCMiner
             Dictionary<string, string> resultSegment = new Dictionary<string, string>();
             String[] segments = data.Split('|');
 
-            foreach (String segment in segments) {
+            foreach (String segment in segments)
+            {
                 String[] items = segment.Split(';');
-                foreach (String item in items) {
+                foreach (String item in items)
+                {
                     String[] keyValue = item.Split('=');
-                    if (keyValue.Length == 2) {
+                    if (keyValue.Length == 2)
+                    {
                         resultSegment.Add(keyValue[0], keyValue[1]);
                     }
                 }
 
-                if (resultSegment.Count > 0) {
+                if (resultSegment.Count > 0)
+                {
                     list.Add(resultSegment.ToList());
                     resultSegment.Clear();
                 }
@@ -47,133 +49,124 @@ namespace FuyukaiMiningClient.Classes.CCMiner
         public CCMiner(Config cfg, TelemetryData.Rig r)
         {
             this.rig = r;
-            Process[] ccminers = Process.GetProcessesByName("ccminer-x64");
-            if (ccminers.Length > 0)
+            summary = new WebSocket("ws://" + cfg.CCMinerHost() + ":" + cfg.CCMinerPort() + "/summary", "text")
             {
-                ccminer = ccminers[0];
-            }
+                WaitTime = TimeSpan.FromSeconds(4)
+            };
 
-            summary = new WebSocket("ws://" + cfg.CCMinerHost() + ":" + cfg.CCMinerPort() + "/summary", "text");
-            hwInfo = new WebSocket("ws://" + cfg.CCMinerHost() + ":" + cfg.CCMinerPort() + "/hwinfo", "text");
-            threads = new WebSocket("ws://" + cfg.CCMinerHost() + ":" + cfg.CCMinerPort() + "/threads", "text");
+            hwInfo = new WebSocket("ws://" + cfg.CCMinerHost() + ":" + cfg.CCMinerPort() + "/hwinfo", "text")
+            {
+                WaitTime = TimeSpan.FromSeconds(4)
+            };
+
+            threads = new WebSocket("ws://" + cfg.CCMinerHost() + ":" + cfg.CCMinerPort() + "/threads", "text")
+            {
+                WaitTime = TimeSpan.FromSeconds(4)
+            };
 
             summary.OnMessage += (sender, e) => {
                 data.Add("summary", e.Data);
                 if (sender is WebSocket s)
                 {
-                    s.CloseAsync();
-                }
-                else
-                {
-                    summary.CloseAsync();
-                }
-                if (!ignoreChain)
-                {
-                    this.CollectHwInfo();
+                    s.Close();
+                    CollectHwInfo();
                 }
             };
             summary.OnError += (sender, e) => {
-                rig.CCMinerError(this);
+                if (sender is WebSocket s)
+                {
+                    OnError(s);
+                }
             };
 
             hwInfo.OnMessage += (sender, e) => {
                 data.Add("hwInfo", e.Data);
                 if (sender is WebSocket s)
                 {
-                    s.CloseAsync();
-                }
-                else
-                {
-                    hwInfo.CloseAsync();
-                }
-                if (!ignoreChain)
-                {
-                    this.CollectThreads();
+                    s.Close();
+                    CollectThreads();
                 }
             };
             hwInfo.OnError += (sender, e) => {
-                if (sender is WebSocket s) {
-                    this.OnError(s);
+                if (sender is WebSocket s)
+                {
+                    OnError(s);
                 }
-                this.OnError();
             };
 
             threads.OnMessage += (sender, e) => {
                 data.Add("threads", e.Data);
                 if (sender is WebSocket s)
                 {
-                    s.CloseAsync();
+                    s.Close();
+                    CollectDone();
                 }
-                else
-                {
-                    threads.CloseAsync();
-                }
-                if (!ignoreChain)
-                {
-                    this.CollectDone();
-                }
+
             };
             threads.OnError += (sender, e) => {
                 if (sender is WebSocket s)
                 {
-                    this.OnError(s);
+                    OnError(s);
                 }
-                this.OnError();
             };
         }
 
         public void Collect()
         {
+            Program.WriteLine("Connect to CCMiner", false, true);
             Process[] ccminers = Process.GetProcessesByName("ccminer-x64");
             if (ccminers.Length > 0)
             {
+                Program.WriteLine("CCMiner found", false, true);
                 this.CollectStart();
-            } else
+            }
+            else
             {
-                this.OnError();
+                OnError();
             }
         }
 
         public void CollectStart()
         {
+            Program.WriteLine("CCMiner: Load Summary", false, true);
             data.Clear();
-            ignoreChain = false;
-            summary.ConnectAsync();
+            summary.Connect();
         }
 
         public void CollectHwInfo()
         {
-            hwInfo.ConnectAsync();
+            Program.WriteLine("CCMiner: Load HW Info", false, true);
+            hwInfo.Connect();
         }
 
         public void CollectThreads()
         {
-            threads.ConnectAsync();
+            Program.WriteLine("CCMiner: Load Mining Threads", false, true);
+            threads.Connect();
         }
 
 
         public void CollectDone()
         {
-            ignoreChain = true;
             rig.CCMinerDone(this, data["summary"], data["hwInfo"], data["threads"]);
         }
 
         public void OnError(WebSocket s)
         {
-            ignoreChain = true;
-            s.CloseAsync();
+            Program.WriteLine("CCMiner: OnError", false, true);
+            s.Close();
             rig.CCMinerError(this);
         }
 
         public void OnError()
         {
-            ignoreChain = true;
+            Program.WriteLine("CCMiner: OnError", false, true);
             rig.CCMinerError(this);
         }
 
         public void Clear()
         {
-            ignoreChain = true;
+            Program.WriteLine("CCMiner: Clear", false, true);
             data.Clear();
             summary.Close();
             threads.Close();

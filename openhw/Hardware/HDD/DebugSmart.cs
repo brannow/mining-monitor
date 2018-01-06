@@ -385,11 +385,13 @@ namespace FuyukaiHWMonitor.Hardware.HDD {
           if (array.Length != 4 && array.Length != 5)
             throw new Exception();
 
-          DriveAttributeValue v = new DriveAttributeValue();
-          v.Identifier = Convert.ToByte(array[0], idBase);
+                    DriveAttributeValue v = new DriveAttributeValue
+                    {
+                        Identifier = Convert.ToByte(array[0], idBase),
 
-          v.RawValue = new byte[6];
-          for (int j = 0; j < 6; j++) {
+                        RawValue = new byte[6]
+                    };
+                    for (int j = 0; j < 6; j++) {
             v.RawValue[j] = Convert.ToByte(array[1].Substring(2 * j, 2), 16);
           }
 
@@ -399,10 +401,12 @@ namespace FuyukaiHWMonitor.Hardware.HDD {
           DriveAttributeValues[i] = v;
 
           if (array.Length == 5) {
-            DriveThresholdValue t = new DriveThresholdValue();
-            t.Identifier = v.Identifier;
-            t.Threshold = Convert.ToByte(array[4], 10);
-            thresholds.Add(t);
+                        DriveThresholdValue t = new DriveThresholdValue
+                        {
+                            Identifier = v.Identifier,
+                            Threshold = Convert.ToByte(array[4], 10)
+                        };
+                        thresholds.Add(t);
           }
         }
 

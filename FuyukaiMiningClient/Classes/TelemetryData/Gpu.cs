@@ -37,18 +37,18 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             r.AppendFormat("\"bus\":{0},", this.GetBusIndex());
             r.AppendFormat("\"name\":\"{0}\",", this.GetName());
             r.AppendFormat("\"reference\":\"{0}\",", this.GetReference());
-            r.AppendFormat("\"temp\":{0},", this.GetTemp());
-            r.AppendFormat("\"mem-used\":{0},", this.GetMemUsed());
-            r.AppendFormat("\"mem-total\":{0},", this.GetMemTotal());
-            r.AppendFormat("\"core-used\":{0},", this.GetCoreUsed());
-            r.AppendFormat("\"fan\":{0},", this.GetFanSpeed());
+            r.AppendFormat("\"temp\":{0},", this.GetTemp().ToString("0.#########"));
+            r.AppendFormat("\"mem-used\":{0},", this.GetMemUsed().ToString("0.#########"));
+            r.AppendFormat("\"mem-total\":{0},", this.GetMemTotal().ToString("0.#########"));
+            r.AppendFormat("\"core-used\":{0},", this.GetCoreUsed().ToString("0.#########"));
+            r.AppendFormat("\"fan\":{0},", this.GetFanSpeed().ToString("0.#########"));
 
-            r.AppendFormat("\"khash-rate\":{0},", hashRate);
-            r.AppendFormat("\"hash-rate-watt\":{0},", hashRateWatt);
+            r.AppendFormat("\"khash-rate\":{0},", hashRate.ToString("0.#########"));
+            r.AppendFormat("\"hash-rate-watt\":{0},", hashRateWatt.ToString("0.#########"));
 
-            r.AppendFormat("\"watt\":{0},", watt);
+            r.AppendFormat("\"watt\":{0},", watt.ToString("0.#########"));
             r.AppendFormat("\"ccminer-bus\":{0},", bus);
-            r.AppendFormat("\"ccminer-temp\":{0}", temp);
+            r.AppendFormat("\"ccminer-temp\":{0}", temp.ToString("0.#########"));
 
             r.Append("}");
             return r.ToString();

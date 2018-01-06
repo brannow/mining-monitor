@@ -9,13 +9,16 @@ namespace FuyukaiMiningClient
 {
     class Program
     {
+
+        private static bool EnvDev = true;
         private static Config config = new Config();
-        private const int INTERVAL = 20000; // 300sec = 5min 
+        private const int INTERVAL = 10 * 60 * 1000; // 10min * 60 * 1000 = milliseconds 
 
         static void Main(string[] args)
         {
             Program.PrintBootHeader();
             Telemetry telemetry = new Telemetry(Program.config);
+            Thread.Sleep(4000);
             telemetry.Send();
 
             while (true) {
@@ -23,6 +26,19 @@ namespace FuyukaiMiningClient
                 telemetry.Send();
             }
             
+        }
+
+        public static void WriteLine(string msg, bool OmitDate = false, bool development = false)
+        {
+            if (development && !EnvDev)
+            {
+                return;
+            } 
+
+            if (!OmitDate)
+                    msg = "[" + DateTime.Now + "] >>> " + msg;
+                Console.WriteLine(msg);
+           
         }
 
         private static void PrintBootHeader()

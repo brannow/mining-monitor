@@ -184,11 +184,13 @@ namespace FuyukaiHWMonitor.Hardware.TBalancer {
 
     private static T CreateDelegate<T>(string entryPoint)
       where T : class {
-      DllImportAttribute attribute = new DllImportAttribute(GetDllName());
-      attribute.CallingConvention = CallingConvention.StdCall;
-      attribute.PreserveSig = true;
-      attribute.EntryPoint = entryPoint;
-      T newDelegate;
+            DllImportAttribute attribute = new DllImportAttribute(GetDllName())
+            {
+                CallingConvention = CallingConvention.StdCall,
+                PreserveSig = true,
+                EntryPoint = entryPoint
+            };
+            T newDelegate;
       PInvokeDelegateFactory.CreateDelegate(attribute, out newDelegate);
       return newDelegate;
     }

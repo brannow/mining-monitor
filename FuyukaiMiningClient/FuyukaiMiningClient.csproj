@@ -79,6 +79,9 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
@@ -176,6 +179,7 @@
     <Compile Include="Classes\Telemetry.cs" />
     <Compile Include="Classes\TelemetryData\Gpu.cs" />
     <Compile Include="Classes\TelemetryData\Rig.cs" />
+    <Compile Include="Classes\TPLink\SmartPowerSocket.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -185,6 +189,8 @@
     <None Include="app.manifest">
       <SubType>Designer</SubType>
     </None>
+    <Compile Include="Classes\Crypto\Xor.cs" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Streaming-Telemetry_2d.ico" />

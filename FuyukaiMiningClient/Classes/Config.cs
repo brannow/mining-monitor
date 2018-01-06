@@ -46,6 +46,7 @@ namespace FuyukaiMiningClient.Classes
             }
             this.configData.Add("ccminer.port", ccminerPort);
 
+            this.configData.Add("smartSocket.host", file.Read("host", "smartSocket"));
         }
 
         private string GetConfigValue(string key)
@@ -78,8 +79,9 @@ namespace FuyukaiMiningClient.Classes
             return this.GetConfigValue("ccminer.host");
         }
 
-        
-
-            
+        public string SmartSocketHost()
+        {
+            return this.GetConfigValue("smartSocket.host");
+        }
     }
 }

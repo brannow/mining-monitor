@@ -930,9 +930,11 @@ namespace WebSocketSharp.Server
         throw new InvalidOperationException (msg, ex);
       }
 
-      _receiveThread = new Thread (new ThreadStart (receiveRequest));
-      _receiveThread.IsBackground = true;
-      _receiveThread.Start ();
+            _receiveThread = new Thread(new ThreadStart(receiveRequest))
+            {
+                IsBackground = true
+            };
+            _receiveThread.Start ();
     }
 
     private void stop (ushort code, string reason)

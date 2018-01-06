@@ -28,41 +28,49 @@ namespace FuyukaiMiningClient.Classes
 
         public void Send()
         {
-            Console.WriteLine("TRY Send -> Collect");
+            Program.WriteLine("Will Collect Data", false, true);
             if (Telemetry.rig.IsCollectorIdle()) {
-                Console.WriteLine("Send -> Collect");
+                Program.WriteLine("Collect Data");
                 Telemetry.rig.Collect();
             }
         }
 
         public void CollectingDone(Rig r, string jsonData)
         {
-            Console.WriteLine(jsonData);
-            Telemetry.request.SendData("{}");
+            Program.WriteLine("Sending...");
+            Program.WriteLine(jsonData, false, true);
+            Telemetry.request.SendData(jsonData);
         }
 
         public void CollectingError(Rig r)
         {
-            Console.WriteLine("CollectingError");
+            Program.WriteLine("Collecting Error");
             this.Clear();
         }
 
         public void SendingDone(Request r, string response)
         {
-            Console.WriteLine("SEND DONE:");
-            Console.WriteLine(response);
+            if (response.Equals("{\"status\":\"0\"}"))
+            {
+                Program.WriteLine("Success");
+            }
+            else
+            {
+                Program.WriteLine("Remote Server Error");
+            }
+            
             this.Clear();
         }
 
         public void SendingError(Request r, Exception e)
         {
-            Console.WriteLine("SEND ERROR:");
-            Console.WriteLine(e.Message);
+            Program.WriteLine("Sending Error: " + e.Message);
             this.Clear();
         }
 
         public void Clear()
         {
+            Program.WriteLine("CleanUp Data", false, true);
             Telemetry.rig.Clear();
         }
     }

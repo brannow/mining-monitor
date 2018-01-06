@@ -166,12 +166,14 @@ namespace WebSocketSharp.Net
 
       var nread = fillFromBuffer (buffer, offset, count);
       if (nread > 0 || nread == -1) {
-        var ares = new HttpStreamAsyncResult (callback, state);
-        ares.Buffer = buffer;
-        ares.Offset = offset;
-        ares.Count = count;
-        ares.SyncRead = nread > 0 ? nread : 0;
-        ares.Complete ();
+                var ares = new HttpStreamAsyncResult(callback, state)
+                {
+                    Buffer = buffer,
+                    Offset = offset,
+                    Count = count,
+                    SyncRead = nread > 0 ? nread : 0
+                };
+                ares.Complete ();
 
         return ares;
       }

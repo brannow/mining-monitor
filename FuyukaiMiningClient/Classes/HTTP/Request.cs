@@ -33,7 +33,6 @@ namespace FuyukaiMiningClient.Classes.HTTP
 
         public async void SendData(string jsonData)
         {
-            Console.WriteLine(">>> SEND REQUEST");
             if (this.serverAddress != null && this.serverAddress.Length > 0)
             {
                 string dateTimeString = DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss");
@@ -61,7 +60,7 @@ namespace FuyukaiMiningClient.Classes.HTTP
                 del.SendingDone(this, responseString);
             }
             else {
-                Console.WriteLine(">>> WARNING: INVLAID SERVER URL, NO DATA SEND");
+                Program.WriteLine("WARNING: INVLAID SERVER URL, NO DATA SEND");
             }
         }
 

@@ -102,9 +102,11 @@ namespace WebSocketSharp.Net
           throw new ArgumentException ("No server certificate could be found.");
 
         _secure = true;
-        _sslConfig = new ServerSslConfiguration (sslConfig);
-        _sslConfig.ServerCertificate = cert;
-      }
+                _sslConfig = new ServerSslConfiguration(sslConfig)
+                {
+                    ServerCertificate = cert
+                };
+            }
 
       _endpoint = endpoint;
       _prefixes = new Dictionary<HttpListenerPrefix, HttpListener> ();
@@ -189,10 +191,12 @@ namespace WebSocketSharp.Net
         var cer = Path.Combine (folderPath, String.Format ("{0}.cer", port));
         var key = Path.Combine (folderPath, String.Format ("{0}.key", port));
         if (File.Exists (cer) && File.Exists (key)) {
-          var cert = new X509Certificate2 (cer);
-          cert.PrivateKey = createRSAFromFile (key);
+                    var cert = new X509Certificate2(cer)
+                    {
+                        PrivateKey = createRSAFromFile(key)
+                    };
 
-          return cert;
+                    return cert;
         }
       }
       catch {

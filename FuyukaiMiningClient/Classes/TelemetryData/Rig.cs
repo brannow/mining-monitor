@@ -15,14 +15,11 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
         private static Computer computer = new Computer();
         private static Gpu[] gpus;
         private static Config config;
-
         private bool collectorStatus = true;
-
         private static CCMiner.CCMiner ccminer;
-
         private Telemetry del;
-
         private static TPLink.SmartPowerSocket smartPlug;
+        private static string userKey = "";
 
         // rig Data
         private string name = "";
@@ -34,6 +31,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
         {
             this.del = del;
             Rig.config = cfg;
+            Rig.userKey = cfg.UserKey();
             Rig.smartPlug = new TPLink.SmartPowerSocket(cfg.SmartSocketHost());
             Rig.computer.CPUEnabled = true;
             Rig.computer.GPUEnabled = true;
@@ -77,6 +75,11 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             return Hardware.HardDriveGUID();
         }
 
+        private string UserKey()
+        {
+            return userKey;
+        }
+
         private string Name()
         {
             return this.name;
@@ -89,6 +92,10 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
 
         public void CCMinerDone(CCMiner.CCMiner c, string summary, string hwInfo, string threads)
         {
+            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            customCulture.NumberFormat.NumberDecimalSeparator = ".";
+            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
+
             Program.WriteLine("CCMiner: Data Collected ... start parsing", false, true);
             IList <IList<KeyValuePair<string, string>>> summaryList = CCMiner.CCMiner.ResultParser(summary);
             if (summaryList.Count() > 0)
@@ -156,18 +163,18 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             {
                 foreach (IList<KeyValuePair<string, string>> gpuData in threadList)
                 {
+                    uint watt = 0;
                     int bus = 0;
                     float khash = 0;
-                    float khashWatt = 0;
 
                     // skip os data we only want GPU data
                     if (gpuData.Count() > 8)
                     {
                         foreach (KeyValuePair<string, string> keyValue in gpuData)
                         {
-                            if (keyValue.Key == "KHW")
+                            if (keyValue.Key == "POWER")
                             {
-                                khashWatt = float.Parse(keyValue.Value);
+                                watt = uint.Parse(keyValue.Value);
                             }
                             if (keyValue.Key == "BUS")
                             {
@@ -188,7 +195,10 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
                             if (g.CompareBusId(bus))
                             {
                                 g.hashRate = khash;
-                                g.hashRateWatt = khashWatt;
+                                if (watt > 0)
+                                {
+                                    g.hashRateWatt = khash / watt;
+                                }
                             }
                         }
                     }
@@ -211,13 +221,14 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
 
             StringBuilder r = new StringBuilder("{");
             Program.WriteLine("Parse Collected Data to Json", false, true);
+            r.AppendFormat("\"user-key\":\"{0}\",", this.UserKey());
             r.AppendFormat("\"identifier\":\"{0}\",", this.Identifier());
             r.AppendFormat("\"name\":\"{0}\",", this.Name());
             r.AppendFormat("\"os-uptime\":{0},", this.Uptime());
             r.AppendFormat("\"cpu-usage\":{0},", this.CpuUsage());
             r.AppendFormat("\"cpu-temp\":{0},", this.CpuTemp());
             r.AppendFormat("\"ram-usage\":{0},", this.RamUsage());
-            r.AppendFormat("\"ccminer-uptime\":{0},", this.minerUptime);
+            r.AppendFormat("\"ccminer-uptime\":{0},", (long)this.minerUptime / 60);
             r.AppendFormat("\"ccminer-khash-rate\":{0},", this.rigHashRate);
 
             TPLink.Power p = Rig.smartPlug.GetPower();
@@ -238,12 +249,19 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
 
         public void Collect()
         {
-            collectorStatus = false;
-            Rig.computer.UpdateHardware();
-            // add external TEMP HDI SENSOR HERE
+            if (this.UserKey().Length > 0)
+            {
+                collectorStatus = false;
+                Rig.computer.UpdateHardware();
+                // add external TEMP HDI SENSOR HERE
 
-            Program.WriteLine("Hardware updated", false, true);
-            ccminer.Collect();
+                Program.WriteLine("Hardware updated", false, true);
+                ccminer.Collect();
+            } else
+            {
+                Program.WriteLine("FATAL:UserKey not found please enter it in config.ini under [User] key=XXXXXXXX");
+                Program.Abort();
+            }
         }
 
         private void CollectingDone()

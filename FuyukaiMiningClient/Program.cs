@@ -13,6 +13,7 @@ namespace FuyukaiMiningClient
         private static bool EnvDev = true;
         private static Config config = new Config();
         private const int INTERVAL = 10 * 60 * 1000; // 10min * 60 * 1000 = milliseconds 
+        private static bool __running = true;
 
         static void Main(string[] args)
         {
@@ -22,11 +23,19 @@ namespace FuyukaiMiningClient
             Thread.Sleep(2000);
             telemetry.Send();
 
-            while (true) {
+            while (__running) {
                 Thread.Sleep(Program.INTERVAL);
                 telemetry.Send();
             }
-            
+
+            Console.WriteLine("...Exiting - press any key to close");
+            Console.ReadKey();
+
+        }
+
+        public static void Abort()
+        {
+            __running = false;
         }
 
         public static void WriteLine(string msg, bool OmitDate = false, bool development = false)

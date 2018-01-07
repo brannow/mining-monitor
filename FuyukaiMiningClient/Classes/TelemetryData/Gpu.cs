@@ -14,7 +14,6 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
         private IHardware gpu;
         public uint watt = 0;
         public float temp = 0;
-        public int ccminerId = 0;
 
         public float hashRate = 0;
         public float hashRateWatt = 0;
@@ -54,7 +53,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
 
         public void Clear()
         {
-            ccminerId = 0;
+            Program.WriteLine("Clear GPU#" + this.GetBusIndex() + " Data", false, true);
             watt = 0;
             temp = 0;
         }

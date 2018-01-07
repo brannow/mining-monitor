@@ -114,7 +114,6 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
                 {
                     uint watt = 0;
                     int bus = 0;
-                    int ccminerId = 0;
                     float temp = 0;
 
                     // skip os data we only want GPU data
@@ -122,10 +121,6 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
                     {
                         foreach (KeyValuePair<string, string> keyValue in gpuData)
                         {
-                            if (keyValue.Key == "GPU")
-                            {
-                                ccminerId = int.Parse(keyValue.Value);
-                            }
                             if (keyValue.Key == "POWER")
                             {
                                 watt = uint.Parse(keyValue.Value);
@@ -147,7 +142,6 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
                             // if this not working use BUS ID compare
                             if (g.CompareBusId(bus))
                             {
-                                g.ccminerId = ccminerId;
                                 g.watt = watt;
                                 g.temp = temp;
                             }
@@ -260,6 +254,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
 
         public void Clear()
         {
+            Program.WriteLine("Clear Rig Data", false, true);
             // clear temp data
             rigHashRate = 0;
             minerUptime = 0;

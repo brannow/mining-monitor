@@ -18,6 +18,7 @@ namespace FuyukaiMiningClient
         {
             Program.PrintBootHeader();
             Telemetry telemetry = new Telemetry(Program.config);
+            Program.WriteLine("WarmUp...", false);
             Thread.Sleep(4000);
             telemetry.Send();
 

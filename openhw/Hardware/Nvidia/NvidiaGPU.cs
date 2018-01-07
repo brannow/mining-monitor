@@ -21,6 +21,7 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
     private readonly Sensor memoryFree;
     private readonly Sensor memoryAvail;
     private readonly Control fanControl;
+        private int busId = -1;
 
     public NvidiaGPU(int adapterIndex, NvPhysicalGpuHandle handle,
       NvDisplayHandle? displayHandle, ISettings settings)
@@ -47,6 +48,13 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
           new ParameterDescription[0], settings);
         ActivateSensor(temperatures[i]);
       }
+
+            int id = -1;
+            if (NVAPI.NvAPI_GPU_GetBusID(handle, out id) == NvStatus.OK)
+            {
+                this.busId = id;
+            }
+
             StringBuilder sn = new StringBuilder(64);
             if (NVAPI.NvAPI_GPU_GetSerialNumber != null &&
               NVAPI.NvAPI_GPU_GetSerialNumber(handle, sn) == NvStatus.OK)
@@ -588,6 +596,11 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
         public string GetSerial()
         {
             return this.serial;
+        }
+
+        public int GetPCIBusId()
+        {
+            return this.busId;
         }
 
         public override void Close() {

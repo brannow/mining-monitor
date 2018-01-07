@@ -189,6 +189,11 @@ namespace FuyukaiHWMonitor.Hardware.ATI {
             return "";
         }
 
+        public int GetPCIBusId()
+        {
+            return this.busNumber;
+        }
+
         public string GetReference()
         {
             return string.Concat(deviceNumber.ToString(),"//", busNumber.ToString());

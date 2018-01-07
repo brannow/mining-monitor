@@ -115,7 +115,8 @@ namespace FuyukaiMiningClient.Classes.CCMiner
         {
             Program.WriteLine("Connect to CCMiner", false, true);
             Process[] ccminers = Process.GetProcessesByName("ccminer-x64");
-            if (ccminers.Length > 0)
+            Process[] ccminer32 = Process.GetProcessesByName("ccminer");
+            if (ccminers.Length > 0 || ccminer32.Length > 0)
             {
                 Program.WriteLine("CCMiner found", false, true);
                 this.CollectStart();

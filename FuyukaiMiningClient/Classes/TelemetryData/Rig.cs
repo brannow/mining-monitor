@@ -112,7 +112,6 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             {
                 foreach (IList<KeyValuePair<string, string>> gpuData in hwInfoGpuList)
                 {
-                    string sn = "";
                     uint watt = 0;
                     int bus = 0;
                     int ccminerId = 0;
@@ -123,10 +122,6 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
                     {
                         foreach (KeyValuePair<string, string> keyValue in gpuData)
                         {
-                            if (keyValue.Key == "SN" && keyValue.Value.Length > 2)
-                            {
-                                sn = (string)keyValue.Value.Substring(2);
-                            }
                             if (keyValue.Key == "GPU")
                             {
                                 ccminerId = int.Parse(keyValue.Value);
@@ -146,15 +141,14 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
                         }
                     }
 
-                    if (sn.Length > 0) {
+                    if (bus > 0) {
                         foreach (Gpu g in Rig.gpus)
                         {
                             // if this not working use BUS ID compare
-                            if (g.CompareSerial(sn))
+                            if (g.CompareBusId(bus))
                             {
                                 g.ccminerId = ccminerId;
                                 g.watt = watt;
-                                g.bus = bus;
                                 g.temp = temp;
                             }
                         }
@@ -197,7 +191,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
                         foreach (Gpu g in Rig.gpus)
                         {
                             // if this not working use BUS ID compare
-                            if (g.bus == bus)
+                            if (g.CompareBusId(bus))
                             {
                                 g.hashRate = khash;
                                 g.hashRateWatt = khashWatt;

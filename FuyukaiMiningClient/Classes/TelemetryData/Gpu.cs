@@ -13,7 +13,6 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
     {
         private IHardware gpu;
         public uint watt = 0;
-        public int bus = 0;
         public float temp = 0;
         public int ccminerId = 0;
 
@@ -47,7 +46,6 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             r.AppendFormat("\"hash-rate-watt\":{0},", hashRateWatt.ToString("0.#########"));
 
             r.AppendFormat("\"watt\":{0},", watt.ToString("0.#########"));
-            r.AppendFormat("\"ccminer-bus\":{0},", bus);
             r.AppendFormat("\"ccminer-temp\":{0}", temp.ToString("0.#########"));
 
             r.Append("}");
@@ -58,7 +56,6 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
         {
             ccminerId = 0;
             watt = 0;
-            bus = 0;
             temp = 0;
         }
 
@@ -137,7 +134,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
         private int GetBusIndex()
         {
             if (gpu is FuyukaiHWMonitor.Hardware.Nvidia.NvidiaGPU gn) {
-                return gn.CurrentAdapterIndex();
+                return gn.GetPCIBusId();
             }else if (gpu is FuyukaiHWMonitor.Hardware.ATI.ATIGPU ga)
             {
                 return ga.CurrentAdapterIndex();
@@ -188,16 +185,16 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             return "";
         }
 
-        public bool CompareSerial(string sn)
+        public bool CompareBusId(int remoteBusId)
         {
-            if (sn.Length > 0) {
+            if (remoteBusId > 0) {
                 if (gpu is FuyukaiHWMonitor.Hardware.Nvidia.NvidiaGPU gn)
                 {
-                    return sn.Equals(gn.GetSerial());
+                    return (remoteBusId == gn.GetPCIBusId());
                 }
                 else if (gpu is FuyukaiHWMonitor.Hardware.ATI.ATIGPU ga)
                 {
-                    return sn.Equals(ga.GetSerial());
+                    return (remoteBusId == ga.GetPCIBusId());
                 }
             }
 

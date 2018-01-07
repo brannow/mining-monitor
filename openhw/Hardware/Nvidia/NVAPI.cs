@@ -270,6 +270,8 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
         public delegate NvStatus NvAPI_GetInterfaceVersionStringDelegate(
           StringBuilder version);
 
+        public delegate NvStatus NvAPI_GPU_GetBusIdDelegate(NvPhysicalGpuHandle gpuHandle, out int busID);
+
         public delegate NvStatus NvAPI_GPU_GetSerialNumberDelegate(
            NvPhysicalGpuHandle gpuHandle, StringBuilder gpuCount);
 
@@ -313,6 +315,8 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
           NvAPI_GPU_GetPCIIdentifiers;
         public static readonly NvAPI_GPU_GetSerialNumberDelegate
           NvAPI_GPU_GetSerialNumber;
+
+        public static readonly NvAPI_GPU_GetBusIdDelegate NvAPI_GPU_GetBusID;
 
         private NVAPI() { }
 
@@ -405,6 +409,7 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
                 GetDelegate(0x01053FA5, out _NvAPI_GetInterfaceVersionString);
                 GetDelegate(0x2DDFB66E, out NvAPI_GPU_GetPCIIdentifiers);
                 GetDelegate(0x14B83A5F, out NvAPI_GPU_GetSerialNumber);
+                GetDelegate(0x1BE0B8E5, out NvAPI_GPU_GetBusID);
                 available = true;
             }
         }

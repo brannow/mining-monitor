@@ -46,7 +46,7 @@ namespace FuyukaiMiningClient
             } 
 
             if (!OmitDate)
-                    msg = "[" + DateTime.Now + "]("+ Thread.CurrentThread.ManagedThreadId.ToString() + ") >>> " + msg;
+                    msg = "[" + DateTime.Now + "]("+ Thread.CurrentThread.ManagedThreadId.ToString() + "|"+ System.Diagnostics.Process.GetCurrentProcess().Threads.Count + ") >>> " + msg;
                 Console.WriteLine(msg);
            
         }

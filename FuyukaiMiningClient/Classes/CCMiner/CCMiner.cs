@@ -159,6 +159,7 @@ namespace FuyukaiMiningClient.Classes.CCMiner
         public void CollectStart()
         {
             data.Clear();
+            runtimeMS = 0;
             stateTimer.Start();
             Program.WriteLine("CCMiner: start loading Summary", false, true);
             summary.ConnectAsync();

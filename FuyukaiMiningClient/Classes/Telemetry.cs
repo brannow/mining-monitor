@@ -15,6 +15,8 @@ namespace FuyukaiMiningClient.Classes
         private static Request request;
         private static Rig rig;
 
+        private uint resetCount = 0;
+
         public Telemetry(Config cfg)
         {
             System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
@@ -28,10 +30,24 @@ namespace FuyukaiMiningClient.Classes
 
         public void Send()
         {
+            if (resetCount >= 3)
+            {
+                Program.WriteLine("Try to Reset all Dangling connections", false, true);
+                Telemetry.rig.Clear();
+                Telemetry.request = new Request(this.config.ServerAddress(), this);
+                Telemetry.rig = new Rig(this.config, this);
+            }
+
             Program.WriteLine("Will Collect Data", false, true);
-            if (Telemetry.rig.IsCollectorIdle()) {
+            if (Telemetry.rig.IsCollectorIdle())
+            {
+                resetCount = 0;
                 Program.WriteLine("Collect Data");
                 Telemetry.rig.Collect();
+            }
+            else 
+            {
+                ++resetCount;
             }
         }
 

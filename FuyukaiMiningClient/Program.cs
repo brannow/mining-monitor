@@ -19,7 +19,7 @@ namespace FuyukaiMiningClient
             Program.PrintBootHeader();
             Telemetry telemetry = new Telemetry(Program.config);
             Program.WriteLine("WarmUp...", false);
-            Thread.Sleep(4000);
+            Thread.Sleep(2000);
             telemetry.Send();
 
             while (true) {
@@ -37,7 +37,7 @@ namespace FuyukaiMiningClient
             } 
 
             if (!OmitDate)
-                    msg = "[" + DateTime.Now + "] >>> " + msg;
+                    msg = "[" + DateTime.Now + "]("+ Thread.CurrentThread.ManagedThreadId.ToString() + ") >>> " + msg;
                 Console.WriteLine(msg);
            
         }

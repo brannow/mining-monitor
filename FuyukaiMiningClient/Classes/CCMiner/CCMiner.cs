@@ -3,19 +3,45 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
+using System.Timers;
 
 using WebSocketSharp;
 
 namespace FuyukaiMiningClient.Classes.CCMiner
 {
-    class CCMiner
+    class CCMiner : System.ComponentModel.ISynchronizeInvoke
     {
+        private delegate object GeneralDelegate(Delegate method,
+                                            object[] args);
+
+        public bool InvokeRequired { get { return true; } }
+
+        public Object Invoke(Delegate method, object[] args)
+        {
+            return method.DynamicInvoke(args);
+        }
+
+        public IAsyncResult BeginInvoke(Delegate method,
+                                        object[] args)
+        {
+            GeneralDelegate x = Invoke;
+            return x.BeginInvoke(method, args, null, x);
+        }
+
+        public object EndInvoke(IAsyncResult result)
+        {
+            GeneralDelegate x = (GeneralDelegate)result.AsyncState;
+            return x.EndInvoke(result);
+        }
+
+
         private WebSocket summary;
         private WebSocket hwInfo;
         private WebSocket threads;
-
         private TelemetryData.Rig rig;
-
+        private static System.Timers.Timer stateTimer;
+        private static uint stateCheckEventsFired = 0;
+        private static double runtimeMS = 0;
         public Dictionary<string, string> data = new Dictionary<string, string>();
 
         public static IList<IList<KeyValuePair<string, string>>> ResultParser(string data)
@@ -48,6 +74,11 @@ namespace FuyukaiMiningClient.Classes.CCMiner
 
         public CCMiner(Config cfg, TelemetryData.Rig r)
         {
+            stateTimer = new System.Timers.Timer(200);
+            stateTimer.Elapsed += CheckState;
+            stateTimer.SynchronizingObject = this;
+            stateTimer.AutoReset = true;
+
             this.rig = r;
             summary = new WebSocket("ws://" + cfg.CCMinerHost() + ":" + cfg.CCMinerPort() + "/summary", "text")
             {
@@ -65,50 +96,48 @@ namespace FuyukaiMiningClient.Classes.CCMiner
             };
 
             summary.OnMessage += (sender, e) => {
+                Program.WriteLine("CCMiner: Summary data rerceived", false, true);
                 data.Add("summary", e.Data);
-                if (sender is WebSocket s)
-                {
-                    s.Close();
-                    CollectHwInfo();
-                }
-            };
-            summary.OnError += (sender, e) => {
-                if (sender is WebSocket s)
-                {
-                    OnError(s);
-                }
             };
 
             hwInfo.OnMessage += (sender, e) => {
+                Program.WriteLine("CCMiner: HWInfo data rerceived", false, true);
                 data.Add("hwInfo", e.Data);
-                if (sender is WebSocket s)
-                {
-                    s.Close();
-                    CollectThreads();
-                }
-            };
-            hwInfo.OnError += (sender, e) => {
-                if (sender is WebSocket s)
-                {
-                    OnError(s);
-                }
             };
 
             threads.OnMessage += (sender, e) => {
+                Program.WriteLine("CCMiner: Threads data rerceived", false, true);
                 data.Add("threads", e.Data);
-                if (sender is WebSocket s)
+            };
+        }
+
+        private static void CheckState(Object sender, ElapsedEventArgs e)
+        {
+            ++stateCheckEventsFired;
+            
+            if (sender is System.Timers.Timer timer)
+            {
+                runtimeMS += timer.Interval;
+
+                if (runtimeMS > 4000)
                 {
-                    s.Close();
-                    CollectDone();
+                    timer.Stop();
+                    if (timer.SynchronizingObject is CCMiner cm)
+                    {
+                        cm.OnError();
+                    }
+                    return;
                 }
 
-            };
-            threads.OnError += (sender, e) => {
-                if (sender is WebSocket s)
+                if (timer.SynchronizingObject is CCMiner ccminer)
                 {
-                    OnError(s);
+                    if (ccminer.data.Count == 3)
+                    {
+                        timer.Stop();
+                        ccminer.CollectDone();
+                    }
                 }
-            };
+            }
         }
 
         public void Collect()
@@ -129,45 +158,42 @@ namespace FuyukaiMiningClient.Classes.CCMiner
 
         public void CollectStart()
         {
-            Program.WriteLine("CCMiner: Load Summary", false, true);
             data.Clear();
-            summary.Connect();
-        }
-
-        public void CollectHwInfo()
-        {
-            Program.WriteLine("CCMiner: Load HW Info", false, true);
-            hwInfo.Connect();
-        }
-
-        public void CollectThreads()
-        {
-            Program.WriteLine("CCMiner: Load Mining Threads", false, true);
-            threads.Connect();
+            stateTimer.Start();
+            Program.WriteLine("CCMiner: start loading Summary", false, true);
+            summary.ConnectAsync();
+            Program.WriteLine("CCMiner: start loading HW Info", false, true);
+            hwInfo.ConnectAsync();
+            Program.WriteLine("CCMiner: start loading Mining Threads", false, true);
+            threads.ConnectAsync();
         }
 
 
         public void CollectDone()
         {
+            stateTimer.Stop();
+            summary.CloseAsync();
+            threads.CloseAsync();
+            hwInfo.CloseAsync();
             rig.CCMinerDone(this, data["summary"], data["hwInfo"], data["threads"]);
-        }
-
-        public void OnError(WebSocket s)
-        {
-            Program.WriteLine("CCMiner: OnError", false, true);
-            s.Close();
-            rig.CCMinerError(this);
         }
 
         public void OnError()
         {
             Program.WriteLine("CCMiner: OnError", false, true);
+            ResetCCMinerConnection();
             rig.CCMinerError(this);
         }
 
         public void Clear()
         {
             Program.WriteLine("CCMiner: Clear", false, true);
+            ResetCCMinerConnection();
+        }
+
+        private void ResetCCMinerConnection()
+        {
+            stateTimer.Stop();
             data.Clear();
             summary.Close();
             threads.Close();

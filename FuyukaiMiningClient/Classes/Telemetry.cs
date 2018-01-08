@@ -66,13 +66,14 @@ namespace FuyukaiMiningClient.Classes
 
         public void SendingDone(Request r, string response)
         {
-            if (response.Equals("{\"status\":\"0\"}"))
+            if (response.Equals("{\"status\":0}"))
             {
                 Program.WriteLine("Success");
             }
             else
             {
-                Program.WriteLine("Remote Server Error");
+                Program.WriteLine("Remote Server Error", false, true);
+                Program.WriteLine("\t" + response, false, true);
             }
             
             this.Clear();

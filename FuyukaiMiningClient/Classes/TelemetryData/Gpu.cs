@@ -11,6 +11,12 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
 {
     class Gpu
     {
+        enum GpuType: uint {
+            Generic = 0,
+            NVIDIA = 1,
+            ATI = 2
+        };
+
         private IHardware gpu;
         public uint watt = 0;
         public float temp = 0;
@@ -35,16 +41,17 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             r.AppendFormat("\"bus\":{0},", this.GetBusIndex());
             r.AppendFormat("\"name\":\"{0}\",", this.GetName());
             r.AppendFormat("\"reference\":\"{0}\",", this.GetReference());
-            r.AppendFormat("\"temp\":{0},", this.GetTemp().ToString("0.#########"));
-            r.AppendFormat("\"mem-used\":{0},", this.GetMemUsed().ToString("0.#########"));
-            r.AppendFormat("\"mem-total\":{0},", this.GetMemTotal().ToString("0.#########"));
-            r.AppendFormat("\"core-used\":{0},", this.GetCoreUsed().ToString("0.#########"));
+            r.AppendFormat("\"core-temp\":{0},", this.GetTemp().ToString("0.#########"));
+            r.AppendFormat("\"ram-usage\":{0},", this.GetMemUsed().ToString("0.#########"));
+            r.AppendFormat("\"ram-total\":{0},", this.GetMemTotal().ToString("0.#########"));
+            r.AppendFormat("\"core-usage\":{0},", this.GetCoreUsed().ToString("0.#########"));
             r.AppendFormat("\"fan\":{0},", this.GetFanSpeed().ToString("0.#########"));
+            r.AppendFormat("\"type\":{0},", (uint)this.GetGpuType());
 
             r.AppendFormat("\"khash-rate\":{0},", hashRate.ToString("0.#########"));
             r.AppendFormat("\"hash-rate-watt\":{0},", hashRateWatt.ToString("0.#########"));
 
-            r.AppendFormat("\"watt\":{0},", watt.ToString("0.#########"));
+            r.AppendFormat("\"power\":{0},", watt.ToString("0.#########"));
             r.AppendFormat("\"ccminer-temp\":{0}", temp.ToString("0.#########"));
 
             r.Append("}");
@@ -71,6 +78,20 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             }
 
             return "";
+        }
+
+        private GpuType GetGpuType()
+        {
+            if (gpu is FuyukaiHWMonitor.Hardware.Nvidia.NvidiaGPU gn)
+            {
+                return GpuType.NVIDIA;
+            }
+            else if (gpu is FuyukaiHWMonitor.Hardware.ATI.ATIGPU ga)
+            {
+                return GpuType.ATI;
+            }
+
+            return GpuType.Generic;
         }
 
         private string GetSerial()

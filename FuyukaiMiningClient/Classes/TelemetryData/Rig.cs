@@ -159,7 +159,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
 
 
             IList<IList<KeyValuePair<string, string>>> threadList = CCMiner.CCMiner.ResultParser(threads);
-            if (hwInfoGpuList.Count() > 0)
+            if (threadList.Count() > 0)
             {
                 foreach (IList<KeyValuePair<string, string>> gpuData in threadList)
                 {
@@ -205,6 +205,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
                 }
             }
 
+            Program.WriteLine("Data Parsed", false, true);
             this.CollectingDone();
         }
 
@@ -221,6 +222,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
 
             StringBuilder r = new StringBuilder("{");
             Program.WriteLine("Parse Collected Data to Json", false, true);
+
             r.AppendFormat("\"user-key\":\"{0}\",", this.UserKey());
             r.AppendFormat("\"identifier\":\"{0}\",", this.Identifier());
             r.AppendFormat("\"name\":\"{0}\",", this.Name());
@@ -231,9 +233,6 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             r.AppendFormat("\"ccminer-uptime\":{0},", (long)this.minerUptime / 60);
             r.AppendFormat("\"ccminer-khash-rate\":{0},", this.rigHashRate);
 
-            TPLink.Power p = Rig.smartPlug.GetPower();
-            r.AppendFormat("\"power\":{0},", p.watt);
-            r.AppendFormat("\"kwh\":{0},", p.kwh);
 
             Program.WriteLine("Parse GPU DATA", false, true);
             List<string> gpujsonStrings = new List<string>();
@@ -241,7 +240,12 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             {
                 gpujsonStrings.Add(g.GpuDataToJson());
             }
-            r.AppendFormat("\"gpus\":[{0}]", string.Join(",", gpujsonStrings));
+            r.AppendFormat("\"gpus\":[{0}],", string.Join(",", gpujsonStrings));
+
+            Program.WriteLine("Look for PowerSocket", false, true);
+            TPLink.Power p = Rig.smartPlug.GetPower();
+            r.AppendFormat("\"power\":{0},", p.watt);
+            r.AppendFormat("\"kwh\":{0}", p.kwh);
 
             r.Append("}");
             return r.ToString();

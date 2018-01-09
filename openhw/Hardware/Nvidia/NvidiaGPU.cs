@@ -59,8 +59,8 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
             if (NVAPI.NvAPI_GPU_GetSerialNumber != null &&
               NVAPI.NvAPI_GPU_GetSerialNumber(handle, sn) == NvStatus.OK)
             {
-                StringBuilder snb = new StringBuilder((sn.Length - 1) * 2);
-                foreach (byte b in sn.ToString().ToCharArray(1, sn.Length - 1))
+                StringBuilder snb = new StringBuilder(sn.Length * 2);
+                foreach (byte b in sn.ToString().ToCharArray())
                 {
                     snb.AppendFormat("{0:X2}", b);
                 }
@@ -528,7 +528,7 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia {
 
                 if (status == NvStatus.OK)
                 {
-                    return string.Concat(deviceId.ToString(), "//", subSystemId.ToString(), "//", revisionId.ToString(), "//", extDeviceId.ToString());
+                    return string.Concat(GetPCIBusId(), "//", GetSerial(), "//", adapterIndex);
                 }
             }
 

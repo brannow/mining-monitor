@@ -82,17 +82,17 @@ namespace FuyukaiMiningClient.Classes.CCMiner
             this.rig = r;
             summary = new WebSocket("ws://" + cfg.CCMinerHost() + ":" + cfg.CCMinerPort() + "/summary", "text")
             {
-                WaitTime = TimeSpan.FromSeconds(4)
+                WaitTime = TimeSpan.FromSeconds(6)
             };
 
             hwInfo = new WebSocket("ws://" + cfg.CCMinerHost() + ":" + cfg.CCMinerPort() + "/hwinfo", "text")
             {
-                WaitTime = TimeSpan.FromSeconds(4)
+                WaitTime = TimeSpan.FromSeconds(6)
             };
 
             threads = new WebSocket("ws://" + cfg.CCMinerHost() + ":" + cfg.CCMinerPort() + "/threads", "text")
             {
-                WaitTime = TimeSpan.FromSeconds(4)
+                WaitTime = TimeSpan.FromSeconds(6)
             };
 
             summary.OnMessage += (sender, e) => {
@@ -119,7 +119,7 @@ namespace FuyukaiMiningClient.Classes.CCMiner
             {
                 runtimeMS += timer.Interval;
 
-                if (runtimeMS > 4000)
+                if (runtimeMS > 6800)
                 {
                     timer.Stop();
                     if (timer.SynchronizingObject is CCMiner cm)
@@ -162,11 +162,11 @@ namespace FuyukaiMiningClient.Classes.CCMiner
             runtimeMS = 0;
             stateTimer.Start();
             Program.WriteLine("CCMiner: start loading Summary", false, true);
-            summary.ConnectAsync();
+            summary.Connect();
             Program.WriteLine("CCMiner: start loading HW Info", false, true);
-            hwInfo.ConnectAsync();
+            hwInfo.Connect();
             Program.WriteLine("CCMiner: start loading Mining Threads", false, true);
-            threads.ConnectAsync();
+            threads.Connect();
         }
 
 

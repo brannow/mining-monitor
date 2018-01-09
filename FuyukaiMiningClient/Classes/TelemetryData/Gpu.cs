@@ -67,17 +67,8 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
 
         private string GetReference()
         {
-
-            if (gpu is FuyukaiHWMonitor.Hardware.Nvidia.NvidiaGPU gn)
-            {
-                return gn.GetReference();
-            }
-            else if (gpu is FuyukaiHWMonitor.Hardware.ATI.ATIGPU ga)
-            {
-                return ga.GetReference();
-            }
-
-            return "";
+            // REPLACE THIS WITH A PROPPER SERIAL NUMBER
+            return MD5Hash.Create(this.GetBusIndex() + "//" + this.GetName());
         }
 
         private GpuType GetGpuType()

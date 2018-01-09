@@ -373,10 +373,9 @@ namespace FuyukaiHWMonitor.Hardware {
             if (cpus.Length > 0 && cpus[0] is CPU.GenericCPU)
             {
                 CPU.GenericCPU cpu = (CPU.GenericCPU)cpus[0];
-                
                 foreach (ISensor sensor in cpu.Sensors)
                 {
-                    if (sensor.SensorType == SensorType.Temperature && sensor.Name != "CPU Package")
+                    if (sensor.SensorType == SensorType.Temperature && sensor.Name != "CPU Package0" && sensor.Value != null)
                     {
                         if (maxTemp < (float)sensor.Value) 
                             maxTemp = (float)sensor.Value;

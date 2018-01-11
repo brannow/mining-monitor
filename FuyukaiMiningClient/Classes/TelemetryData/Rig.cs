@@ -16,7 +16,6 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
         private static Gpu[] gpus;
         private static Config config;
         private bool collectorStatus = true;
-        private static CCMiner.CCMiner ccminer;
         private Telemetry del;
         private static TPLink.SmartPowerSocket smartPlug;
         private static string userKey = "";
@@ -26,6 +25,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
         // TEMP RIG DATA
         private float rigHashRate = 0;
         private long minerUptime = 0;
+        private CCMinerCollector ccminerCollector;
 
         public Rig(Config cfg, Telemetry del)
         {
@@ -46,8 +46,19 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             }
             Rig.gpus = list.ToArray();
             this.name = cfg.RigName();
+            this.ccminerCollector = new CCMinerCollector(cfg.CCMinerHost(), cfg.CCMinerPort(), this);
+        }
 
-            ccminer = new CCMiner.CCMiner(cfg, this);
+        private Gpu GetGpuByBus(uint bus)
+        {
+            foreach (Gpu gpuToCheck in Rig.gpus) {
+                if (gpuToCheck.CompareBusId(bus))
+                {
+                    return gpuToCheck;
+                }
+            }
+
+            return null;
         }
 
         private float CpuUsage()
@@ -90,130 +101,6 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             return collectorStatus;
         }
 
-        public void CCMinerDone(CCMiner.CCMiner c, string summary, string hwInfo, string threads)
-        {
-            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
-            customCulture.NumberFormat.NumberDecimalSeparator = ".";
-            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
-
-            Program.WriteLine("CCMiner: Data Collected ... start parsing", false, true);
-            IList <IList<KeyValuePair<string, string>>> summaryList = CCMiner.CCMiner.ResultParser(summary);
-            if (summaryList.Count() > 0)
-            {
-                IList<KeyValuePair<string, string>> summaryResult = summaryList[0];
-                foreach (KeyValuePair<string, string> keyValue in summaryResult)
-                {
-                    if (keyValue.Key == "KHS")
-                    {
-                        rigHashRate = float.Parse(keyValue.Value);
-                    }
-                    if (keyValue.Key == "UPTIME")
-                    {
-                        minerUptime = long.Parse(keyValue.Value);
-                    }
-                }
-            }
-
-            IList<IList<KeyValuePair<string, string>>> hwInfoGpuList = CCMiner.CCMiner.ResultParser(hwInfo);
-            if (hwInfoGpuList.Count() > 0)
-            {
-                foreach (IList<KeyValuePair<string, string>> gpuData in hwInfoGpuList)
-                {
-                    uint watt = 0;
-                    int bus = 0;
-                    float temp = 0;
-
-                    // skip os data we only want GPU data
-                    if (gpuData.Count() > 10)
-                    {
-                        foreach (KeyValuePair<string, string> keyValue in gpuData)
-                        {
-                            if (keyValue.Key == "POWER")
-                            {
-                                watt = uint.Parse(keyValue.Value);
-                            }
-                            if (keyValue.Key == "BUS")
-                            {
-                                bus = int.Parse(keyValue.Value);
-                            }
-                            if (keyValue.Key == "TEMP")
-                            {
-                                temp = float.Parse(keyValue.Value);
-                            }
-                        }
-                    }
-
-                    if (bus > 0) {
-                        foreach (Gpu g in Rig.gpus)
-                        {
-                            // if this not working use BUS ID compare
-                            if (g.CompareBusId(bus))
-                            {
-                                g.watt = watt;
-                                g.temp = temp;
-                            }
-                        }
-                    }
-                }
-            }
-
-
-            IList<IList<KeyValuePair<string, string>>> threadList = CCMiner.CCMiner.ResultParser(threads);
-            if (threadList.Count() > 0)
-            {
-                foreach (IList<KeyValuePair<string, string>> gpuData in threadList)
-                {
-                    uint watt = 0;
-                    int bus = 0;
-                    float khash = 0;
-
-                    // skip os data we only want GPU data
-                    if (gpuData.Count() > 8)
-                    {
-                        foreach (KeyValuePair<string, string> keyValue in gpuData)
-                        {
-                            if (keyValue.Key == "POWER")
-                            {
-                                watt = uint.Parse(keyValue.Value);
-                            }
-                            if (keyValue.Key == "BUS")
-                            {
-                                bus = int.Parse(keyValue.Value);
-                            }
-                            if (keyValue.Key == "KHS")
-                            {
-                                khash = float.Parse(keyValue.Value);
-                            }
-                        }
-                    }
-
-                    if (bus > 0)
-                    {
-                        foreach (Gpu g in Rig.gpus)
-                        {
-                            // if this not working use BUS ID compare
-                            if (g.CompareBusId(bus))
-                            {
-                                g.hashRate = khash;
-                                if (watt > 0)
-                                {
-                                    g.hashRateWatt = khash / watt;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            Program.WriteLine("Data Parsed", false, true);
-            this.CollectingDone();
-        }
-
-        public void CCMinerError(CCMiner.CCMiner c)
-        {
-            del.CollectingError(this);
-        }
-
         private string RigDataToJsonString()
         {
             System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
@@ -232,7 +119,6 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             r.AppendFormat("\"ram-usage\":{0},", this.RamUsage());
             r.AppendFormat("\"ccminer-uptime\":{0},", (long)this.minerUptime / 60);
             r.AppendFormat("\"ccminer-khash-rate\":{0},", this.rigHashRate);
-
 
             Program.WriteLine("Parse GPU DATA", false, true);
             List<string> gpujsonStrings = new List<string>();
@@ -256,16 +142,49 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             if (this.UserKey().Length > 0)
             {
                 collectorStatus = false;
+                Program.WriteLine("Hardware updated", false, true);
                 Rig.computer.UpdateHardware();
                 // add external TEMP HDI SENSOR HERE
 
-                Program.WriteLine("Hardware updated", false, true);
-                ccminer.Collect();
+                ccminerCollector.CollectData();
             } else
             {
                 Program.WriteLine("FATAL:UserKey not found please enter it in config.ini under [User] key=XXXXXXXX");
                 Program.Abort();
             }
+        }
+
+        public void CCMinerCollectorDone(CCMinerResult result)
+        {
+            Program.WriteLine("All CCMiner Data aquired", false, true);
+
+            Program.WriteLine("Process Summary", false, true);
+            this.rigHashRate = result.summaryResult.rigHashRate;
+            this.minerUptime = result.summaryResult.minerUptime;
+
+            Program.WriteLine("Process HWInfo", false, true);
+            foreach(GPUHWInfoResult hwResult in result.GPUHWInfoResult)
+            {
+                Gpu g = this.GetGpuByBus(hwResult.bus);
+                if (g != null)
+                {
+                    g.temp = hwResult.temperature;
+                }
+            }
+
+            Program.WriteLine("Process Threads", false, true);
+            foreach (GPUThreadResult threadResult in result.GPUThreadResult)
+            {
+                Gpu g = this.GetGpuByBus(threadResult.bus);
+                if (g != null)
+                {
+                    g.watt = threadResult.watt;
+                    g.hashRate = threadResult.hashRateK;
+                    g.hashRateWatt = threadResult.hashRateK / threadResult.watt;
+                }
+            }
+
+            this.CollectingDone();
         }
 
         private void CollectingDone()
@@ -282,7 +201,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             minerUptime = 0;
 
             // clear ccminer data
-            ccminer.Clear();
+            ccminerCollector.Clear();
             foreach (Gpu g in Rig.gpus)
             {
                 g.Clear();

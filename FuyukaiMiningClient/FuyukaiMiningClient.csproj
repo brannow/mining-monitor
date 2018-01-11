@@ -93,7 +93,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\CCMiner\BaseSyncClass.cs" />
     <Compile Include="Classes\CCMiner\CCMiner.cs" />
+    <Compile Include="Classes\CCMiner\CCMinerCollector.cs" />
     <Compile Include="Classes\Config.cs" />
     <Compile Include="Classes\Crypto\MD5Hash.cs" />
     <Compile Include="Classes\Hardware.cs" />
@@ -193,6 +195,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="nvml.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Streaming-Telemetry_2d.ico" />
   </ItemGroup>
   <ItemGroup>

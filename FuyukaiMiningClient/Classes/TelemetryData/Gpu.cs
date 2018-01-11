@@ -11,7 +11,8 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
 {
     class Gpu
     {
-        enum GpuType: uint {
+        enum GpuType : uint
+        {
             Generic = 0,
             NVIDIA = 1,
             ATI = 2
@@ -27,6 +28,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
         public Gpu(IHardware gpu)
         {
             this.gpu = gpu;
+            Program.WriteLine("GPU DETECTED: " + this.GetReference());
         }
 
         public string GpuDataToJson()
@@ -63,12 +65,18 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             Program.WriteLine("Clear GPU#" + this.GetBusIndex() + " Data", false, true);
             watt = 0;
             temp = 0;
+            hashRate = 0;
+            hashRateWatt = 0;
         }
 
         private string GetReference()
         {
-            // REPLACE THIS WITH A PROPPER SERIAL NUMBER
-            return MD5Hash.Create(this.GetBusIndex() + "//" + this.GetName());
+            if (gpu is FuyukaiHWMonitor.Hardware.Nvidia.NvidiaGPU gn)
+            {
+                return gn.GetUUID();
+            }
+
+            return "";
         }
 
         private GpuType GetGpuType()
@@ -142,13 +150,15 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             return 0;
         }
 
-        private int GetBusIndex()
+        private uint GetBusIndex()
         {
-            if (gpu is FuyukaiHWMonitor.Hardware.Nvidia.NvidiaGPU gn) {
-                return gn.GetPCIBusId();
-            }else if (gpu is FuyukaiHWMonitor.Hardware.ATI.ATIGPU ga)
+            if (gpu is FuyukaiHWMonitor.Hardware.Nvidia.NvidiaGPU gn)
             {
-                return ga.CurrentAdapterIndex();
+                return gn.GetPCIBusId();
+            }
+            else if (gpu is FuyukaiHWMonitor.Hardware.ATI.ATIGPU ga)
+            {
+                return (uint)ga.CurrentAdapterIndex();
             }
 
             return 0;
@@ -196,9 +206,10 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             return "";
         }
 
-        public bool CompareBusId(int remoteBusId)
+        public bool CompareBusId(uint remoteBusId)
         {
-            if (remoteBusId > 0) {
+            if (remoteBusId > 0)
+            {
                 if (gpu is FuyukaiHWMonitor.Hardware.Nvidia.NvidiaGPU gn)
                 {
                     return (remoteBusId == gn.GetPCIBusId());

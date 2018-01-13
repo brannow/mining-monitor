@@ -159,7 +159,7 @@ namespace FuyukaiMiningClient.Classes
             {
                 runtimeMS += timer.Interval;
 
-                if (((timeoutStrike < 5 && runtimeMS > CCMiner.timeout) && (ccminer.data == null || ccminer.data.Length == 0)) || ccminer.errorReceived)
+                if (timeoutStrike < 5 && ((runtimeMS > CCMiner.timeout && (ccminer.data == null || ccminer.data.Length == 0)) || ccminer.errorReceived))
                 {
                     ++timeoutStrike;
                     Program.WriteLine("Timeout Retry ("+ timeoutStrike + "/5)", false, true);

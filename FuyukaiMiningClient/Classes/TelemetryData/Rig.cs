@@ -158,6 +158,12 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
         {
             Program.WriteLine("All CCMiner Data aquired", false, true);
 
+            if (result.GPUHWInfoResult == null || result.GPUThreadResult == null)
+            {
+                del.CollectingError(this);
+                return;
+            }
+
             Program.WriteLine("Process Summary", false, true);
             this.rigHashRate = result.summaryResult.rigHashRate;
             this.minerUptime = result.summaryResult.minerUptime;

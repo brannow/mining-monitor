@@ -10,6 +10,7 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia
         private int adapterIndex;
         private NvPhysicalGpuHandle handle;
         private NvDisplayHandle? displayHandle;
+        private nvmlDevice? nvmlDeviceHandle;
 
         private string serial = "";
         private string uuid = "";
@@ -34,23 +35,7 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia
           : base(GetName(handle), new Identifier("nvidiagpu",
               adapterIndex.ToString(CultureInfo.InvariantCulture)), settings)
         {
-            if (NvmlNativeMethods.nvmlDeviceGetSerial(nvmlDeviceHandle, out string serialOut) == nvmlReturn.Success)
-            {
-                this.serial = serialOut;
-            }
-
-            if (NvmlNativeMethods.nvmlDeviceGetUUID(nvmlDeviceHandle, out string uuidOut) == nvmlReturn.Success)
-            {
-                this.uuid = uuidOut;
-            }
-
-            nvmlPciInfo pciInfo = new nvmlPciInfo();
-            if (NvmlNativeMethods.nvmlDeviceGetPciInfo(nvmlDeviceHandle, ref pciInfo) == nvmlReturn.Success)
-            {
-                this.busId = pciInfo.bus;
-                this.pciInfo = pciInfo;
-            }
-
+            this.nvmlDeviceHandle = nvmlDeviceHandle;
             this.InitGPU(adapterIndex, handle, displayHandle, settings);
         }
 
@@ -204,6 +189,29 @@ namespace FuyukaiHWMonitor.Hardware.Nvidia
 
         public override void Update()
         {
+            if (nvmlDeviceHandle != null)
+            {
+                nvmlDevice currentNvmlDevice = (nvmlDevice)nvmlDeviceHandle;
+
+                if (NvmlNativeMethods.nvmlDeviceGetSerial(currentNvmlDevice, out string serialOut) == nvmlReturn.Success)
+                {
+                    this.serial = serialOut;
+                }
+
+                if (NvmlNativeMethods.nvmlDeviceGetUUID(currentNvmlDevice, out string uuidOut) == nvmlReturn.Success)
+                {
+                    this.uuid = uuidOut;
+                }
+
+                nvmlPciInfo pciInfo = new nvmlPciInfo();
+
+                if (NvmlNativeMethods.nvmlDeviceGetPciInfo(currentNvmlDevice, ref pciInfo) == nvmlReturn.Success)
+                {
+                    this.busId = pciInfo.bus;
+                    this.pciInfo = pciInfo;
+                }
+            }
+
             NvGPUThermalSettings settings = GetThermalSettings();
             foreach (Sensor sensor in temperatures)
                 sensor.Value = settings.Sensor[sensor.Index].CurrentTemp;

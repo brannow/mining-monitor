@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FuyukaiMiningClient.Classes
 {
     public struct CCMinerResult
     {
-        public SummaryResult summaryResult;
-        public GPUHWInfoResult[] GPUHWInfoResult;
         public GPUThreadResult[] GPUThreadResult;
     }
 
@@ -52,25 +47,9 @@ namespace FuyukaiMiningClient.Classes
             if (processCheck.Length > 0 || processCheck32.Length > 0)
             {
                 connectionQueue.Clear();
-                connectionQueue.Enqueue(new CCMiner(host, port, CCMinerConnectionType.Summary, this));
-                connectionQueue.Enqueue(new CCMiner(host, port, CCMinerConnectionType.HWInfo, this));
                 connectionQueue.Enqueue(new CCMiner(host, port, CCMinerConnectionType.Threads, this));
             }
         
-            this.QueueWorker();
-        }
-
-        public void DoneCollectSummary(SummaryResult summary)
-        {
-            Program.WriteLine("Done Collecting Summary", false, true);
-            this.result.summaryResult = summary;
-            this.QueueWorker();
-        }
-
-        public void DoneCollectHWinfo(GPUHWInfoResult[] hwInfos)
-        {
-            Program.WriteLine("Done Collecting HWInfo", false, true);
-            this.result.GPUHWInfoResult = hwInfos;
             this.QueueWorker();
         }
 

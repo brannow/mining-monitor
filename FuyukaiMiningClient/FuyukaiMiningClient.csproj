@@ -97,8 +97,6 @@
     <Compile Include="Classes\CCMiner\CCMiner.cs" />
     <Compile Include="Classes\CCMiner\CCMinerCollector.cs" />
     <Compile Include="Classes\Config.cs" />
-    <Compile Include="Classes\Crypto\MD5Hash.cs" />
-    <Compile Include="Classes\Hardware.cs" />
     <Compile Include="Classes\HTTP\Request.cs" />
     <Compile Include="Classes\HTTP\WebSocket\ByteOrder.cs" />
     <Compile Include="Classes\HTTP\WebSocket\CloseEventArgs.cs" />
@@ -179,7 +177,6 @@
     <Compile Include="Classes\HTTP\WebSocket\WebSocketState.cs" />
     <Compile Include="Classes\IniFile.cs" />
     <Compile Include="Classes\Telemetry.cs" />
-    <Compile Include="Classes\TelemetryData\Gpu.cs" />
     <Compile Include="Classes\TelemetryData\Rig.cs" />
     <Compile Include="Classes\TPLink\SmartPowerSocket.cs" />
     <Compile Include="GlobalSuppressions.cs" />

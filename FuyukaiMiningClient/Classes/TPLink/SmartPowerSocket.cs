@@ -1,25 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using System.Net.Sockets;
 using FuyukaiMiningClient.Classes.Crypto;
 
 using Newtonsoft.Json;
 using System.Net.NetworkInformation;
-
-/**
- * Windows 10 command line 
- * netsh wlan set hostednetwork mode=allow ssid=tp_test key=082a7e835bc7
- * netsh wlan start hostednetwork
- * 
- * find smart plug:
- * arp -a
- * 
- * setup config with ip
- **/
 
 namespace FuyukaiMiningClient.Classes.TPLink
 {

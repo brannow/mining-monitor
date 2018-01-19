@@ -27,10 +27,9 @@ namespace FuyukaiMiningClient
                 Thread.Sleep(Program.INTERVAL);
                 telemetry.Send();
             }
-
+            
             Console.WriteLine("...Exiting - press any key to close");
             Console.ReadKey();
-
         }
 
         public static void Abort()
@@ -65,8 +64,8 @@ namespace FuyukaiMiningClient
             Console.WriteLine("#");
             Console.WriteLine("#   Supported Hardware:");
             Console.WriteLine("#        TP - Link Smart Wireless PowerSocket (Global PowerUsage)");
-            Console.WriteLine("#        ccminer (GPU Temp, GPU usage, HashRate, GPU PowerUsage)");
-            Console.WriteLine("#        HDI-Temp - Sensor (External USB Room Temp Sensor)");
+            Console.WriteLine("#        ccminer (HashRate)");
+            Console.WriteLine("#        soon: HDI-Temp - Sensor (External USB Room Temp Sensor)");
             Console.WriteLine("#");
             Console.WriteLine("#########################################################################");
         }

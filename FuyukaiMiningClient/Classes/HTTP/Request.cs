@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-using FuyukaiMiningClient.Classes.Crypto;
+using FuyukaiLib.Crypto;
 
 namespace FuyukaiMiningClient.Classes.HTTP
 {

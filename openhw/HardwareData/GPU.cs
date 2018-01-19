@@ -81,7 +81,11 @@ namespace FuyukaiLib.HardwareData
 
         public float GetHashRate()
         {
-            return hashRate;
+            if (coreUsage > 15) {
+                return hashRate;
+            }
+
+            return 0;
         }
 
         public uint GetBus()
@@ -114,8 +118,8 @@ namespace FuyukaiLib.HardwareData
             r.AppendFormat("\"core-usage\":{0},",coreUsage.ToString("0.#########"));
             r.AppendFormat("\"fan\":{0},", fanSpeed.ToString("0.#########"));
             r.AppendFormat("\"type\":{0},", (uint)type);
-            r.AppendFormat("\"khash-rate\":{0},", hashRate.ToString("0.#########"));
-            r.AppendFormat("\"hash-rate-watt\":{0},", (hashRate / power).ToString("0.#########"));
+            r.AppendFormat("\"khash-rate\":{0},", GetHashRate().ToString("0.#########"));
+            r.AppendFormat("\"hash-rate-watt\":{0},", (GetHashRate() / power).ToString("0.#########"));
             r.AppendFormat("\"power\":{0},", power.ToString("0.#########"));
             r.AppendFormat("\"active\":{0}", active);
             r.Append("}");

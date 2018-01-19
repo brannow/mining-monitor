@@ -57,7 +57,6 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             TPLink.Power p = this.smartPlug.GetPower();
             if (p.watt == 0)
             {
-                // we asume a offset of 60 Watt for a complete rig
                 p.watt = hardware.GetPower();
             }
 

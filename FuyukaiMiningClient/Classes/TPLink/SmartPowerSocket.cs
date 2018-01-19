@@ -98,7 +98,7 @@ namespace FuyukaiMiningClient.Classes.TPLink
                     sender.Connect(address, port);
                     connected = true;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     Program.WriteLine("...failed", false, true);
                     connected = false;

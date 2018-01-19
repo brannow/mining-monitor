@@ -1,4 +1,5 @@
 ﻿using FuyukaiLib;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -47,8 +48,10 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             r.AppendFormat("\"user-key\":\"{0}\",", this.userKey);
             r.AppendFormat("\"identifier\":\"{0}\",", this.hardware.GetHardwareIdentifier());
             r.AppendFormat("\"name\":\"{0}\",", this.name);
-            r.AppendFormat("\"os-uptime\":{0},", this.hardware.GetUpTime());
+            r.AppendFormat("\"os\":{0},", Rig.IsLinux?2:1);
+            r.AppendFormat("\"client-uptime\":{0},", this.hardware.GetUpTime());
             r.AppendFormat("\"cpu-usage\":{0},", this.hardware.GetCPUUsage());
+            r.AppendFormat("\"environment-temp\":{0},", this.hardware.GetEnviormentTemp());
             r.AppendFormat("\"cpu-temp\":{0},", this.hardware.GetCPUTemp());
             r.AppendFormat("\"ram-usage\":{0},", this.hardware.GetRamUsage());
             r.AppendFormat("\"khash-rate\":{0},", this.hardware.GetHashRate());
@@ -61,12 +64,22 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             }
 
             Program.WriteLine("Parse GPU DATA", false, true);
+            
             r.AppendFormat("\"gpus\":{0},", this.hardware.GetGPUJson());
             r.AppendFormat("\"power\":{0},", p.watt);
             r.AppendFormat("\"kwh\":{0}", p.kwh);
 
             r.Append("}");
             return r.ToString();
+        }
+
+        public static bool IsLinux
+        {
+            get
+            {
+                int p = (int)Environment.OSVersion.Platform;
+                return (p == 4) || (p == 6) || (p == 128);
+            }
         }
 
         public void Collect()

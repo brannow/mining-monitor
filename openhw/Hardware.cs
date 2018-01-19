@@ -2,6 +2,7 @@
 using System.Diagnostics;
 
 using FuyukaiLib.HardwareData;
+using FuyukaiLib.HardwareData.SensorData;
 
 namespace FuyukaiLib
 {
@@ -12,6 +13,8 @@ namespace FuyukaiLib
         private CPU cpu;
         private Ram ram;
 
+        private TempSensor envTempSensor;
+
         public Hardware()
         {
             Lib.Generic.Opcode.Open();
@@ -20,8 +23,15 @@ namespace FuyukaiLib
             this.cpu = CPU.DetectCPU();
             this.ram = Ram.DetectRam();
             this.gpus = GPU.DetectGPUS();
+            this.envTempSensor = TempSensor.DetectSensor();
 
             this.Update();
+        }
+
+        public static void Close()
+        {
+            Lib.Generic.Opcode.Close();
+            Lib.Generic.Ring0.Close();
         }
 
         public bool SetHashRateForGPUAtBus(uint bus, float hashRate)
@@ -66,6 +76,20 @@ namespace FuyukaiLib
             {
                 this.ram.Update();
             }
+
+            // check external sensor Data
+            if (this.envTempSensor == null)
+            {
+                this.envTempSensor = TempSensor.DetectSensor();
+            }
+            else
+            {
+                this.envTempSensor.Update();
+                if (this.envTempSensor.IsFailure())
+                {
+                    this.envTempSensor = null;
+                }
+            }
         }
 
         public string GetHardwareIdentifier()
@@ -91,6 +115,15 @@ namespace FuyukaiLib
         public uint GetRamUsage()
         {
             return this.ram.GetUsage();
+        }
+
+        public float GetEnviormentTemp()
+        {
+            if (this.envTempSensor != null) {
+                return this.envTempSensor.GetTemp();
+            }
+
+            return 0;
         }
 
         public float GetHashRate()
@@ -130,11 +163,8 @@ namespace FuyukaiLib
 
         public uint GetUpTime()
         {
-            PerformanceCounter pc = new PerformanceCounter("System", "System Up Time");
-            pc.NextValue();
-            uint uptime = (uint)pc.NextValue();
-
-            return uptime;
+            System.TimeSpan dt = System.DateTime.UtcNow - Process.GetCurrentProcess().StartTime.ToUniversalTime();
+            return (uint)dt.TotalMinutes;
         }
     }
 }

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FuyukaiLib</RootNamespace>
     <AssemblyName>FuyukaiLib</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -31,6 +31,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,6 +43,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -52,6 +54,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -61,6 +64,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -69,6 +73,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -87,10 +92,25 @@
     <Compile Include="HardwareData\GPUData\Nvidia.cs" />
     <Compile Include="HardwareData\HardDrive.cs" />
     <Compile Include="HardwareData\Ram.cs" />
+    <Compile Include="HardwareData\SensorData\TempSensor.cs" />
     <Compile Include="Lib\Generic\Opcode.cs" />
     <Compile Include="Lib\Generic\Pair.cs" />
     <Compile Include="Lib\Generic\PInvokeDelegateFactory.cs" />
     <Compile Include="Lib\Generic\ThreadAffinity.cs" />
+    <Compile Include="Lib\HID\Extensions.cs" />
+    <Compile Include="Lib\HID\HidAsyncState.cs" />
+    <Compile Include="Lib\HID\HidDevice.cs" />
+    <Compile Include="Lib\HID\HidDeviceAttributes.cs" />
+    <Compile Include="Lib\HID\HidDeviceCapabilities.cs" />
+    <Compile Include="Lib\HID\HidDeviceData.cs" />
+    <Compile Include="Lib\HID\HidDeviceEventMonitor.cs" />
+    <Compile Include="Lib\HID\HidDevices.cs" />
+    <Compile Include="Lib\HID\HidFastReadDevice.cs" />
+    <Compile Include="Lib\HID\HidFastReadEnumerator.cs" />
+    <Compile Include="Lib\HID\HidReport.cs" />
+    <Compile Include="Lib\HID\IHidDevice.cs" />
+    <Compile Include="Lib\HID\IHidEnumerator.cs" />
+    <Compile Include="Lib\HID\NativeMethods.cs" />
     <Compile Include="Lib\NVML\NVAPI.cs" />
     <Compile Include="Lib\NVML\NvmlNativeMethods.cs" />
     <Compile Include="Lib\NVML\NvmlTypes.cs" />

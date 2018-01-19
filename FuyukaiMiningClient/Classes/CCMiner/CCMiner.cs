@@ -73,37 +73,38 @@ namespace FuyukaiMiningClient.Classes
 
         public void LoadData()
         {
-            string node = "";
-            if (this.type == CCMinerConnectionType.Threads)
-            {
-                node = "threads";
+            if (this.host.Length > 0 && this.port.Length > 0) {
+                string node = "";
+                if (this.type == CCMinerConnectionType.Threads)
+                {
+                    node = "threads";
+                }
+                Program.WriteLine("Send CCminer Api Request: " + node, false, true);
+
+                if (request != null)
+                {
+                    request.Close();
+                }
+
+                Thread.Sleep(250);
+
+                request = new WebSocket("ws://" + this.host + ":" + this.port + "/" + node, "text")
+                {
+                    WaitTime = TimeSpan.FromSeconds(5)
+                };
+
+                request.OnMessage += this.MessageReceived;
+                request.OnError += this.MessageError;
+
+                timeoutTimer = new System.Timers.Timer(200);
+                runtimeMS = 0;
+                timeoutTimer.Elapsed += CheckAnswerState;
+                timeoutTimer.SynchronizingObject = this;
+                timeoutTimer.AutoReset = true;
+
+                timeoutTimer.Start();
+                request.ConnectAsync();
             }
-            Program.WriteLine("Send CCminer Api Request: " + node, false, true);
-            
-            if (request != null)
-            {
-                request.Close();
-            }
-
-            Thread.Sleep(250);
-
-            request = new WebSocket("ws://" + this.host + ":" + this.port + "/" + node, "text")
-            {
-                WaitTime = TimeSpan.FromSeconds(5)
-            };
-
-            request.OnMessage += this.MessageReceived;
-            request.OnError += this.MessageError;
-
-            timeoutTimer = new System.Timers.Timer(200);
-            runtimeMS = 0;
-            timeoutTimer.Elapsed += CheckAnswerState;
-            timeoutTimer.SynchronizingObject = this;
-            timeoutTimer.AutoReset = true;
-
-            timeoutTimer.Start();
-            request.ConnectAsync();
-
         }
 
         public void MessageReceived(object sender, MessageEventArgs e)

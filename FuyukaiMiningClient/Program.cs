@@ -17,9 +17,10 @@ namespace FuyukaiMiningClient
 
         static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
             Program.PrintBootHeader();
-            Telemetry telemetry = new Telemetry(Program.config);
             Program.WriteLine("WarmUp...", false);
+            Telemetry telemetry = new Telemetry(Program.config);
             Thread.Sleep(2000);
             telemetry.Send();
 
@@ -27,7 +28,9 @@ namespace FuyukaiMiningClient
                 Thread.Sleep(Program.INTERVAL);
                 telemetry.Send();
             }
-            
+
+            FuyukaiLib.Hardware.Close();
+
             Console.WriteLine("...Exiting - press any key to close");
             Console.ReadKey();
         }
@@ -35,6 +38,11 @@ namespace FuyukaiMiningClient
         public static void Abort()
         {
             __running = false;
+        }
+
+        static void OnProcessExit(object sender, EventArgs e)
+        {
+            FuyukaiLib.Hardware.Close();
         }
 
         public static void WriteLine(string msg, bool OmitDate = false, bool development = false)
@@ -63,9 +71,10 @@ namespace FuyukaiMiningClient
             Console.WriteLine("#   Send Telemetry Data to Mining Control Server");
             Console.WriteLine("#");
             Console.WriteLine("#   Supported Hardware:");
-            Console.WriteLine("#        TP - Link Smart Wireless PowerSocket (Global PowerUsage)");
-            Console.WriteLine("#        ccminer (HashRate)");
-            Console.WriteLine("#        soon: HDI-Temp - Sensor (External USB Room Temp Sensor)");
+            Console.WriteLine("#        TP - Link Smart Wireless PowerSocket HS110 (Global PowerUsage)");
+            Console.WriteLine("#        ccminer API (HashRate)");
+            Console.WriteLine("#        HDI-Temp - Sensor (External USB Room Temp Sensor) ");
+            Console.WriteLine("#                   DiaMex - TempTest (DS18B20)");
             Console.WriteLine("#");
             Console.WriteLine("#########################################################################");
         }

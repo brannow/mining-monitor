@@ -63,11 +63,12 @@ namespace FuyukaiMiningClient.Classes.HTTP
             if (this.serverAddress != null && this.serverAddress.Length > 0)
             {
                 string dateTimeString = DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss");
-
+                string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
                 // create post dict
                 Dictionary<string, string> data = new Dictionary<string, string>
             {
                 { "payload", jsonData },
+                { "version", version },
                 { "datetime",  dateTimeString },
                 { "signature", this.GenerateSignature(jsonData, dateTimeString) }
             };

@@ -92,14 +92,17 @@ namespace FuyukaiLib
             }
         }
 
-        public string GetHardwareIdentifier()
+        public string GetHardwareIdentifier(string salt = "")
         {
-            StringBuilder b = new StringBuilder();
+            string rootDeviceSerial = "";
             foreach (HardDrive hdd in this.drives) {
-                b.Append(hdd.GetSerial());
+                if (hdd.IsRootDevice()) {
+                    rootDeviceSerial = hdd.GetSerial();
+                    break;
+                }
             }
 
-            return Crypto.MD5Hash.Create(b.ToString());
+            return Crypto.MD5Hash.Create(input: rootDeviceSerial + "__" + salt);
         }
 
         public uint GetCPUUsage()

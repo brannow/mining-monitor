@@ -70,7 +70,7 @@ namespace FuyukaiMiningClient
             Console.WriteLine("#");
             Console.WriteLine("#   Send Telemetry Data to Mining Control Server");
             Console.WriteLine("#");
-            Console.WriteLine("#   Supported Hardware:");
+            Console.WriteLine("#   Supported External Hardware:");
             Console.WriteLine("#        TP - Link Smart Wireless PowerSocket HS110 (Global PowerUsage)");
             Console.WriteLine("#        ccminer API (HashRate)");
             Console.WriteLine("#        HDI-Temp - Sensor (External USB Room Temp Sensor) ");

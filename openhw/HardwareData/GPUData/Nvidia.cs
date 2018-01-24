@@ -38,8 +38,6 @@ namespace FuyukaiLib.HardwareData.GPUData
             }
 
             NVAPIhandle = this.FindPhysicalGpuHandleForBus(this.bus);
-
-            Update();
         }
 
         private NvPhysicalGpuHandle FindPhysicalGpuHandleForBus(uint bus)

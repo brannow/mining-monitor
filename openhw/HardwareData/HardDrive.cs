@@ -8,6 +8,18 @@ namespace FuyukaiLib.HardwareData
     {
         public static HardDrive[] DetectDrives()
         {
+            ManagementObjectSearcher Finder = new ManagementObjectSearcher("Select * from Win32_OperatingSystem");
+            string Name = "";
+            string deviceId = "";
+            foreach (ManagementObject OS in Finder.Get()) Name = OS["Name"].ToString();
+
+            //Name = "Microsoft Windows XP Professional|C:\WINDOWS|\Device\Harddisk0\Partition1"
+
+            int ind = Name.IndexOf("|") +1;
+            if (ind > 1) {
+                deviceId = Name.Substring(ind, 2);
+            }
+
             ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_LogicalDisk");
             List<HardDrive> drives = new List<HardDrive>();
             foreach (ManagementObject wmi_HD in searcher.Get())
@@ -16,7 +28,7 @@ namespace FuyukaiLib.HardwareData
                 if (wmi_HD["VolumeSerialNumber"] != null)
                 {
                     HardDrive hdd = null;
-                    hdd = new HardDrive(wmi_HD);
+                    hdd = new HardDrive(wmi_HD, deviceId);
                     if (hdd != null)
                     {
                         drives.Add(hdd);
@@ -29,11 +41,18 @@ namespace FuyukaiLib.HardwareData
 
         private readonly string deviceID;
         private readonly string serial;
+        private readonly bool isRootDevice = false;
 
-        public HardDrive(ManagementObject data)
+        public HardDrive(ManagementObject data, string rootId = "")
         {
             deviceID = Convert.ToString(data.Properties["DeviceId"].Value);
+            isRootDevice = (bool)(deviceID.Equals(rootId) && deviceID != "");
             serial = Convert.ToString(data.Properties["VolumeSerialNumber"].Value);
+        }
+
+        public bool IsRootDevice()
+        {
+            return isRootDevice;
         }
 
         public void Update()

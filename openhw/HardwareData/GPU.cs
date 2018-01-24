@@ -119,7 +119,6 @@ namespace FuyukaiLib.HardwareData
             r.AppendFormat("\"fan\":{0},", fanSpeed.ToString("0.#########"));
             r.AppendFormat("\"type\":{0},", (uint)type);
             r.AppendFormat("\"khash-rate\":{0},", GetHashRate().ToString("0.#########"));
-            r.AppendFormat("\"hash-rate-watt\":{0},", (GetHashRate() / power).ToString("0.#########"));
             r.AppendFormat("\"power\":{0},", power.ToString("0.#########"));
             r.AppendFormat("\"active\":{0}", active);
             r.Append("}");

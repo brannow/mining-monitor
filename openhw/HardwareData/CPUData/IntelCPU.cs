@@ -217,7 +217,6 @@ namespace FuyukaiLib.HardwareData.CPUData
             {
                 supportPackageTemp = true;
             }
-
         }
 
         public override void Update()

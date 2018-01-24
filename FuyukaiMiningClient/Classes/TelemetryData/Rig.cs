@@ -46,7 +46,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             Program.WriteLine("Parse Collected Data to Json", false, true);
 
             r.AppendFormat("\"user-key\":\"{0}\",", this.userKey);
-            r.AppendFormat("\"identifier\":\"{0}\",", this.hardware.GetHardwareIdentifier());
+            r.AppendFormat("\"identifier\":\"{0}\",", this.hardware.GetHardwareIdentifier(this.userKey));
             r.AppendFormat("\"name\":\"{0}\",", this.name);
             r.AppendFormat("\"os\":{0},", Rig.IsLinux?2:1);
             r.AppendFormat("\"client-uptime\":{0},", this.hardware.GetUpTime());

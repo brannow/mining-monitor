@@ -15,7 +15,6 @@ namespace FuyukaiLib.HardwareData
 
         public Ram()
         {
-            this.Update();
         }
 
         public void Update()

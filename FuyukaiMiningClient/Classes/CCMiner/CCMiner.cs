@@ -10,6 +10,7 @@ namespace FuyukaiMiningClient.Classes
 {
     enum CCMinerConnectionType : uint
     {
+        Summary = 1,
         Threads = 2
     };
 
@@ -18,6 +19,11 @@ namespace FuyukaiMiningClient.Classes
     {
         public uint bus;
         public float hashRateK;
+    }
+
+    public struct GPUSummaryResult
+    {
+        public string algo;
     }
 
     class CCMiner : BaseSyncClass
@@ -78,6 +84,10 @@ namespace FuyukaiMiningClient.Classes
                 if (this.type == CCMinerConnectionType.Threads)
                 {
                     node = "threads";
+                }
+                if (this.type == CCMinerConnectionType.Summary)
+                {
+                    node = "summary";
                 }
                 Program.WriteLine("Send CCminer Api Request: " + node, false, true);
 
@@ -159,6 +169,31 @@ namespace FuyukaiMiningClient.Classes
             {
                 collector.DoneCollectHWThreads(this.ParseThreadResult());
             }
+            if (this.type == CCMinerConnectionType.Summary)
+            {
+                collector.DoneCollectSummary(this.ParseSummaryResult());
+            }
+        }
+
+        private GPUSummaryResult ParseSummaryResult()
+        {
+            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)Thread.CurrentThread.CurrentCulture.Clone();
+            customCulture.NumberFormat.NumberDecimalSeparator = ".";
+            Thread.CurrentThread.CurrentCulture = customCulture;
+
+            GPUSummaryResult result = new GPUSummaryResult();
+
+            List<Dictionary<string, string>> summaryData = ResultParser(data, 2);
+
+            if (summaryData.Count() == 1)
+            {
+                Dictionary<string, string> summery = summaryData.FirstOrDefault();
+                if (summery.ContainsKey("ALGO")) {
+                    result.algo = summery["ALGO"];
+                }
+            }
+
+            return result;
         }
 
         private GPUThreadResult[] ParseThreadResult()

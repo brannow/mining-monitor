@@ -7,6 +7,7 @@ namespace FuyukaiMiningClient.Classes
     public struct CCMinerResult
     {
         public GPUThreadResult[] GPUThreadResult;
+        public GPUSummaryResult summary;
     }
 
     class CCMinerCollector
@@ -47,9 +48,17 @@ namespace FuyukaiMiningClient.Classes
             if (processCheck.Length > 0 || processCheck32.Length > 0)
             {
                 connectionQueue.Clear();
+                connectionQueue.Enqueue(new CCMiner(host, port, CCMinerConnectionType.Summary, this));
                 connectionQueue.Enqueue(new CCMiner(host, port, CCMinerConnectionType.Threads, this));
             }
         
+            this.QueueWorker();
+        }
+
+        public void DoneCollectSummary(GPUSummaryResult summaryResult)
+        {
+            Program.WriteLine("Done Collecting Summary", false, true);
+            this.result.summary = summaryResult;
             this.QueueWorker();
         }
 

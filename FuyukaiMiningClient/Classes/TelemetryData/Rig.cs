@@ -19,6 +19,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
         private Hardware hardware = new Hardware();
         private CCMinerCollector ccminerCollector;
         private TPLink.SmartPowerSocket smartPlug;
+        private string currentAlgo = "";
 
         public Rig(Config cfg, Telemetry del)
         {
@@ -50,6 +51,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
             r.AppendFormat("\"name\":\"{0}\",", this.name);
             r.AppendFormat("\"os\":{0},", Rig.IsLinux?2:1);
             r.AppendFormat("\"client-uptime\":{0},", this.hardware.GetUpTime());
+            r.AppendFormat("\"algo\":\"{0}\",", this.currentAlgo);
             r.AppendFormat("\"cpu-usage\":{0},", this.hardware.GetCPUUsage());
             r.AppendFormat("\"environment-temp\":{0},", this.hardware.GetEnviormentTemp());
             r.AppendFormat("\"cpu-temp\":{0},", this.hardware.GetCPUTemp());
@@ -103,6 +105,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
         {
             Program.WriteLine("All CCMiner Data aquired", false, true);
 
+            this.currentAlgo = result.summary.algo;
             if (result.GPUThreadResult != null)
             {
                 Program.WriteLine("Process Threads", false, true);
@@ -125,6 +128,7 @@ namespace FuyukaiMiningClient.Classes.TelemetryData
         {
             Program.WriteLine("Clear Rig Data", false, true);
             // clear ccminer data
+            currentAlgo = "";
             ccminerCollector.Clear();
             // unlock Rig
             collectorStatus = true;
